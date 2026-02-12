@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useGetCallerProfile } from './hooks/useQueries';
@@ -13,10 +14,13 @@ import { Settings } from './pages/Settings';
 import { useState } from 'react';
 import type { DatingProfile } from './backend';
 import { Principal } from '@dfinity/principal';
+import { FatalErrorBoundary } from './components/FatalErrorBoundary';
+import { I18nProvider } from './i18n/I18nProvider';
+import { ThemeProvider } from 'next-themes';
 
 type PageType = 'home' | 'matches' | 'chat' | 'profile' | 'settings' | 'install';
 
-function App() {
+function AppContent() {
   const { identity } = useInternetIdentity();
   const isOnline = useOnlineStatus();
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerProfile();
@@ -24,6 +28,12 @@ function App() {
   const [selectedMatch, setSelectedMatch] = useState<{ profile: DatingProfile; principal: Principal | null } | null>(null);
 
   const isAuthenticated = !!identity;
+
+  // Signal that the app has mounted successfully
+  useEffect(() => {
+    window.dispatchEvent(new Event('app-mounted'));
+    console.log('[App] React app mounted successfully');
+  }, []);
 
   if (!isOnline) {
     return <OfflineState />;
@@ -114,6 +124,18 @@ function App() {
         <Chat match={selectedMatch.profile} matchPrincipal={selectedMatch.principal} onBack={handleBackFromChat} />
       )}
     </AppLayout>
+  );
+}
+
+function App() {
+  return (
+    <FatalErrorBoundary>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <I18nProvider>
+          <AppContent />
+        </I18nProvider>
+      </ThemeProvider>
+    </FatalErrorBoundary>
   );
 }
 

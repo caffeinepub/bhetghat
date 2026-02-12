@@ -1,63 +1,25 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T15:32:13.527Z",
-  "summary": "REQ-32 appears implemented via the new mobile-web-app-capable meta tag. REQ-30 is not fully met because the HTML still directly loads /src/main.tsx, which would cause production to request a dev-only path. REQ-31 cannot be confirmed from the diff because no actual PNG icon assets are shown as added/validated—only references/links were updated. The diff also includes multiple substantial new UI/features (i18n, offline UI, language toggle, expanded pages) that were not requested and may violate the “no new product features” constraint.",
+  "generatedAt": "2026-02-12T16:35:56.212Z",
+  "summary": "REQ-40 appears implemented by adding a always-visible Menu (hamburger) button in the header that triggers the existing right-side Sheet navigation. REQ-39 is not evidenced in the provided diff summary (no actor creation/useActor changes shown), so the createActor warning fix appears missing from this change set.",
   "missing_requirements": [
     {
-      "id": "REQ-30",
-      "requirement": "Fix the production startup path so the deployed app never attempts to import the dev-only entry `/src/main.tsx` in production, and the React app reliably mounts in production.",
-      "reason": "The modified `frontend/index.html` still includes a module script with `src='/src/main.tsx'`, which would cause the browser to request `/src/main.tsx` (dev-only) when opening the production URL.",
+      "id": "REQ-39",
+      "requirement": "Remove the production console warning by ensuring the frontend actor creation path passes only one of `agent` or `agentOptions` to `createActor` (including authenticated identity case in `frontend/src/hooks/useActor.ts`).",
+      "reason": "The diff summary shows modifications only to `frontend/src/components/AppLayout.tsx` and metadata/summary files; there is no evidence of changes to the actor creation path or `frontend/src/hooks/useActor.ts` to prevent passing both `agent` and `agentOptions`.",
       "evidence": [
-        "frontend/index.html"
-      ]
-    },
-    {
-      "id": "REQ-31",
-      "requirement": "Ensure all icon files referenced by `frontend/public/manifest.webmanifest` and `frontend/index.html` exist under `frontend/public/assets/generated/` and are valid PNGs served with HTTP 200.",
-      "reason": "The diff summary shows updated references to icon paths, but does not show the PNG files themselves being added or modified under `frontend/public/assets/generated/`, so existence/validity cannot be verified from the provided changes.",
-      "evidence": [
-        "frontend/index.html",
-        "frontend/public/manifest.webmanifest",
-        "frontend-file-summaries.txt"
+        "frontend/src/components/AppLayout.tsx",
+        "frontend-file-summaries.txt",
+        "project_state.json"
       ]
     }
   ],
-  "hallucinated_features": [
-    {
-      "description": "Added/expanded bilingual (English/Nepali) i18n system, including translation dictionaries and language persistence provider.",
-      "reason": "BuildRequest focuses on fixing blank page (prod entry loading) and PWA icon/meta issues; i18n expansion is not requested and is a new product capability beyond what is necessary for those fixes.",
-      "evidence": [
-        "frontend-file-summaries.txt (frontend/src/i18n/translations.ts, frontend/src/i18n/I18nProvider.tsx)"
-      ]
-    },
-    {
-      "description": "Added a user-facing Language Toggle UI component.",
-      "reason": "Not requested by REQ-30/31/32 and falls under “Do not add new product features … beyond what is necessary”.",
-      "evidence": [
-        "frontend-file-summaries.txt (frontend/src/components/LanguageToggle.tsx)"
-      ]
-    },
-    {
-      "description": "Added/expanded offline UX components/pages (offline hook, OfflineState component, offline.html).",
-      "reason": "Not requested as part of fixing production entry loading or PWA icon/meta issues.",
-      "evidence": [
-        "frontend-file-summaries.txt (frontend/src/hooks/useOnlineStatus.ts, frontend/src/components/OfflineState.tsx, frontend/public/offline.html)"
-      ]
-    },
-    {
-      "description": "Mentions/service-worker-related offline support registration in the React entry point.",
-      "reason": "BuildRequest non-goal says not to re-enable service worker caching behavior; the diff summary indicates `frontend/src/main.tsx` includes SW registration for offline support (even if SW is currently in disable mode, this is additional behavior not requested for REQ-30/31/32).",
-      "evidence": [
-        "frontend-file-summaries.txt (frontend/src/main.tsx)"
-      ]
-    }
-  ],
-  "confidence": 0.74,
+  "hallucinated_features": [],
+  "confidence": 0.72,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/index.html",
-    "frontend/public/entry-loader.js",
+    "frontend/src/components/AppLayout.tsx",
     "project_state.json"
   ]
 }

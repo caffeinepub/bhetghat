@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-production-startup-path-so-the-deployed-app-never-attempts-to-import-the-dev-only-entry-src-main-tsx-in-production-and-the-react-app-reliably-mounts-renders-welcome-or-authenticated-ui-when-opening-the-live-url-https-bhetghat-fus-caffeine-xyz-caffeineadmintoken-b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e",
-      "featureTitle": "Fix the production startup path so the deployed app never attempts to import the dev-only entry `/src/main.tsx` in production, and the React app reliably mounts (renders Welcome or authenticated UI) when opening the live URL `https://bhetghat-fus.caffeine.xyz/#caffeineAdminToken=b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e`.",
+      "featureId": "feature-update-the-global-navbar-header-ui-so-a-menu-icon-is-visible-on-desktop-web-and-is-positioned-at-the-top-right-of-the-page-and-clicking-it-opens-the-same-right-side-navigation-sheet-currently-used-on-mobile",
+      "featureTitle": "Update the global Navbar header UI so a menu icon is visible on desktop/web and is positioned at the top-right of the page, and clicking it opens the same right-side navigation sheet currently used on mobile.",
       "files": [
-        "frontend/index.html",
-        "frontend/public/entry-loader.js"
+        "frontend/src/components/AppLayout.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -17,26 +16,7 @@
         "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-30"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-pwa-meta-tags-in-frontend-index-html-to-address-the-deprecation-warning-by-including-meta-name-mobile-web-app-capable-content-yes-while-keeping-existing-apple-tags-as-needed",
-      "featureTitle": "Update PWA meta tags in `frontend/index.html` to address the deprecation warning by including `<meta name=\"mobile-web-app-capable\" content=\"yes\">` (while keeping existing Apple tags as needed).",
-      "files": [
-        "frontend/index.html"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
-      ],
-      "testIds": [
-        "REQ-32"
+        "REQ-40"
       ],
       "confidence": "high"
     }

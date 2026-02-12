@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 19,
+  "projectStateVersion": 25,
   "summary": "Building “Bhetghat”, a free bilingual (English+Nepali) Nepali dating web app similar to Tinder, with swipe matching, detailed profiles, chat after matching, advertisement space, and optimized as an installable PWA (Add to Home Screen) since App Store/Play Store distribution and Nepali wallet payments aren’t supported.",
   "architectural_notes": [
     "Payments disabled: no eSewa/Khalti/Nepali banking wallets; build as free app without requiring credit card/Stripe.",
@@ -9,7 +9,10 @@
     "Blank white screen root cause identified: production is attempting to load frontend entry at /src/main.tsx (dev-only path) instead of the built asset bundle under /assets; app entry point/index.html needs correction for production builds.",
     "Startup/blank-page mitigation decision: temporarily disable/unregister the PWA service worker to bypass potentially stale cached index.html/assets until the production entry-point issue is fully resolved.",
     "Console shows manifest icon load/validity problem: /assets/generated/pwa-icon.dim_192x192.png is failing to download or is not a valid image; PWA icon assets under frontend/public/assets/generated need to be valid PNGs and correctly served in production.",
-    "Browser console warning: <meta name=\"apple-mobile-web-app-capable\"> is deprecated; add/ensure <meta name=\"mobile-web-app-capable\" content=\"yes\"> for modern compatibility (non-blocking)."
+    "Browser console warning: <meta name=\"apple-mobile-web-app-capable\"> is deprecated; add/ensure <meta name=\"mobile-web-app-capable\" content=\"yes\"> for modern compatibility (non-blocking).",
+    "Runtime crash identified: `useI18n must be used within I18nProvider` coming from AppLayout; app root must wrap AppLayout in I18nProvider (and ensure i18n initialization occurs before any component calls useI18n).",
+    "Production console error observed: `[Boot Watchdog] App failed to mount within 10 seconds`, indicating the React app bundle is still not mounting in production (blank screen persists; error appears after a few seconds).",
+    "Production console warning to address: createActor is being called with both `agent` and `agentOptions`; standardize actor creation to pass only one to avoid warnings and potential misconfiguration."
   ],
   "known_issues": [
     "Deployment/build failing with a 'System configuration error' (platform-level build issue).",
@@ -17,10 +20,13 @@
     "After deploying Version 5, the live app still renders a blank page (no UI visible) at the production URL with #caffeineAdminToken hash.",
     "Root cause identified for blank page: production is trying to load /src/main.tsx (not present in production), preventing React from mounting; fix requires updating the app entry point/index.html to reference built assets.",
     "Likely contributor to persistent blank page: service worker caching/serving stale index.html or asset paths; plan is to temporarily disable the service worker to force fresh loads.",
-    "Production console reports manifest icon error: https://bhetghat-fus.caffeine.xyz/assets/generated/pwa-icon.dim_192x192.png is not a valid image or failed to download (may affect PWA installability and could contribute to startup issues)."
+    "Production console reports manifest icon error: https://bhetghat-fus.caffeine.xyz/assets/generated/pwa-icon.dim_192x192.png is not a valid image or failed to download (may affect PWA installability and could contribute to startup issues).",
+    "Live app shows loading error due to runtime exception: `useI18n must be used within I18nProvider` (AppLayout calling useI18n without provider), preventing UI from rendering.",
+    "Production console reports `entry-loader.js:82 [Boot Watchdog] App failed to mount within 10 seconds`; user sees a blank white screen and then a “Loading Error……” after a few seconds (app still not mounting).",
+    "Production console shows warning: 'Detected both agent and agentOptions passed to createActor. Ignoring agentOptions...'",
+    "Production console shows chextloader initialization log; user requests it be fixed/removed."
   ],
   "isFixRequest": true,
-  "imageRequirements": "## Required Images\n- Flat, modern app icon with a heart + chat bubble motif on a warm pink/rose background (pwa-icon.dim_192x192.png, 192x192)\n- Flat, modern app icon with a heart + chat bubble motif on a warm pink/rose background (pwa-icon.dim_512x512.png, 512x512)\n- Flat, modern maskable app icon with centered heart + chat bubble motif and safe padding (pwa-icon-maskable.dim_512x512.png, 512x512)\n- Simple flat favicon icon mark using the same motif (favicon.dim_48x48.png, 48x48)\n- Simple flat icon mark using the same motif (apple-touch-icon.dim_180x180.png, 180x180)",
   "existing_features": [
     {
       "id": "feature-configure-the-bhetghat-web-app-as-an-installable-progressive-web-app-pwa-so-users-on-android-chrome-and-ios-safari-can-add-it-to-their-home-screen-and-launch-it-full-screen",
@@ -245,6 +251,54 @@
         "REQ-32"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-resolve-the-manifest-icon-validation-download-error-by-ensuring-all-icon-files-referenced-by-frontend-public-manifest-webmanifest-and-frontend-index-html-exist-under-frontend-public-assets-generated-and-are-valid-png-images-correct-content-correct-dimensions-and-successfully-served-in-particular-fix-https-bhetghat-fus-caffeine-xyz-assets-generated-pwa-icon-dim-192x192-png-so-the-browser-no-longer-reports-it-as-an-invalid-image-download-error",
+      "title": "Resolve the manifest icon validation/download error by ensuring all icon files referenced by `frontend/public/manifest.webmanifest` and `frontend/index.html` exist under `frontend/public/assets/generated/` and are valid PNG images (correct content, correct dimensions, and successfully served). In particular, fix `https://bhetghat-fus.caffeine.xyz/assets/generated/pwa-icon.dim_192x192.png` so the browser no longer reports it as an invalid image/download error.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-fix-the-production-startup-so-the-react-app-reliably-mounts-and-the-live-site-no-longer-stays-blank-white-screen-and-then-shows-a-delayed-loading-error-boot-watchdog-error",
+      "title": "Fix the production startup so the React app reliably mounts and the live site no longer stays blank (white screen) and then shows a delayed “Loading Error”/boot watchdog error.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-index-html-so-it-loads-the-react-application-entry-in-addition-to-entry-loader-js-the-current-html-only-includes-entry-loader-js-so-react-never-mounts-ensure-the-production-build-outputs-an-index-html-that-references-the-built-js-bundle-e-g-under-assets-rather-than-a-dev-only-source-path",
+      "title": "Update `frontend/index.html` so it loads the React application entry in addition to `entry-loader.js` (the current HTML only includes `/entry-loader.js`, so React never mounts). Ensure the production build outputs an `index.html` that references the built JS bundle (e.g., under `/assets/...`) rather than a dev-only source path.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-prevent-the-runtime-crash-usei18n-must-be-used-within-i18nprovider-by-ensuring-the-rendered-app-is-wrapped-in-i18nprovider-before-any-component-calls-usei18n-notably-applayout-and-languagetoggle-because-frontend-src-main-tsx-is-immutable-implement-the-provider-wrapping-within-frontend-src-app-tsx-or-a-new-wrapper-component-used-by-app",
+      "title": "Prevent the runtime crash `useI18n must be used within I18nProvider` by ensuring the rendered app is wrapped in `I18nProvider` before any component calls `useI18n` (notably `AppLayout` and `LanguageToggle`). Because `frontend/src/main.tsx` is immutable, implement the provider wrapping within `frontend/src/App.tsx` (or a new wrapper component used by `App`).",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-fatal-startup-runtime-errors-render-a-user-visible-error-ui-instead-of-leaving-the-page-blank-by-wiring-the-existing-fatalerrorboundary-high-enough-in-the-react-tree-wrap-the-app-content-in-frontend-src-app-tsx-since-main-tsx-is-immutable-user-facing-text-shown-by-this-fallback-must-be-english",
+      "title": "Ensure fatal startup/runtime errors render a user-visible error UI instead of leaving the page blank by wiring the existing `FatalErrorBoundary` high enough in the React tree (wrap the app content in `frontend/src/App.tsx`, since `main.tsx` is immutable). User-facing text shown by this fallback must be English.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-global-navbar-header-ui-so-a-menu-icon-is-visible-on-desktop-web-and-is-positioned-at-the-top-right-of-the-page-and-clicking-it-opens-the-same-right-side-navigation-sheet-currently-used-on-mobile",
+      "title": "Update the global Navbar header UI so a menu icon is visible on desktop/web and is positioned at the top-right of the page, and clicking it opens the same right-side navigation sheet currently used on mobile.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -319,6 +373,34 @@
       "summary": "Resolve the manifest icon download/validation error by ensuring all icon files referenced by `frontend/public/manifest.webmanifest` and `frontend/index.html` exist under `frontend/public/assets/generated/` and are valid PNG images served with a successful HTTP response.",
       "reqIds": [
         "REQ-31"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Fix the runtime startup crash `useI18n must be used within I18nProvider` by ensuring the React component tree is wrapped in `I18nProvider` before any component calls `useI18n` (including `AppLayout` and `LanguageToggle`). Because `frontend/src/main.tsx` is immutable, apply the provider wrapping within `frontend/src/App.tsx` (or a new wrapper component used by `App`) so the app can render without throwing.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Fix console warnings/logs in production: 'Detected both agent and agentOptions passed to createActor' and remove/disable chextloader initialization log",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add/show a menu icon on the Navbar in desktop/web view, positioned at the top-right of the page",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Remove the production console warning `Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.` by ensuring the frontend actor creation path passes only one of `agent` or `agentOptions` to the underlying `createActor` implementation (including the authenticated identity case in `frontend/src/hooks/useActor.ts`).",
+      "reqIds": [
+        "REQ-39"
       ],
       "status": "pending"
     }

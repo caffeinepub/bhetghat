@@ -62,7 +62,13 @@
   // If the React app fails to mount within 10 seconds, show error screen
   let appMounted = false;
   
-  // Mark app as mounted when React renders
+  // Listen for explicit app-mounted signal from React
+  window.addEventListener('app-mounted', () => {
+    appMounted = true;
+    console.log('[Boot Watchdog] App mounted successfully');
+  });
+  
+  // Also watch for DOM mutations as fallback
   const observer = new MutationObserver(() => {
     const root = document.getElementById('root');
     if (root && root.children.length > 0) {
@@ -125,9 +131,6 @@
             <p style="color: #666; margin: 0.5rem 0; line-height: 1.6;">
               ${message}
             </p>
-            <p style="color: #666; margin: 0.5rem 0; line-height: 1.6;">
-              एप्लिकेसन लोड गर्न असफल भयो। कृपया पृष्ठ रिफ्रेस गर्नुहोस्।
-            </p>
             <button 
               onclick="window.location.reload()" 
               style="
@@ -142,7 +145,7 @@
                 font-weight: 500;
               "
             >
-              Reload / पुन: लोड गर्नुहोस्
+              Reload Page
             </button>
           </div>
         </div>

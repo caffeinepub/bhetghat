@@ -1,12 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the production blank white page by ensuring the correct production entry loads and restore valid PWA icon assets so the manifest has no icon errors.
+**Goal:** Remove the production `createActor` console warning and update the Navbar so the menu icon is visible and usable on desktop.
 
 **Planned changes:**
-- Correct the production startup/loading path so the deployed app does not attempt to import the dev-only entry `/src/main.tsx`, and the React app reliably mounts on the live URL.
-- Add a visible in-`#root` error screen/fallback if the JS bundle fails to load, avoiding a silent blank page.
-- Ensure all manifest and index-referenced icon files exist under `frontend/public/assets/generated/` and are valid PNGs served successfully.
-- Update `frontend/index.html` PWA meta tags to include `<meta name="mobile-web-app-capable" content="yes">` while retaining Apple-specific tags as needed.
+- Adjust the frontend actor creation flow to ensure only one of `agent` or `agentOptions` is passed to `createActor`, including the authenticated identity path in `frontend/src/hooks/useActor.ts`.
+- Update the global Navbar header so a hamburger/menu icon appears on desktop at the top-right and opens the existing right-side navigation sheet (matching current mobile behavior).
 
-**User-visible outcome:** Opening the live URL renders the app UI (or a clear error screen if loading fails), and the browser manifest/application view shows no PWA icon download/validation errors or related deprecation warnings.
+**User-visible outcome:** The app no longer logs the `createActor` agent/agentOptions warning in production, and desktop users can open the same right-side navigation menu via a top-right menu icon (with mobile behavior unchanged).

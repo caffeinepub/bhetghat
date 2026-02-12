@@ -61,15 +61,15 @@ export function InstallHelp() {
 
       <Card className="mt-8">
         <CardHeader>
-          <CardTitle className="text-lg">Why Install?</CardTitle>
-          <CardDescription>Benefits of installing Bhetghat</CardDescription>
+          <CardTitle className="text-lg">{t('whyInstall')}</CardTitle>
+          <CardDescription>{t('whyInstallDescription')}</CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2 text-sm">
-            <li>✓ Quick access from your home screen</li>
-            <li>✓ Full-screen experience without browser UI</li>
-            <li>✓ Works offline with cached content</li>
-            <li>✓ Faster loading and better performance</li>
+            <li>✓ {t('quickAccess')}</li>
+            <li>✓ {t('fullScreen')}</li>
+            <li>✓ {t('worksOffline')}</li>
+            <li>✓ {t('fasterLoading')}</li>
           </ul>
         </CardContent>
       </Card>

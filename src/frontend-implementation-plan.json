@@ -1,98 +1,82 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix build/deploy configuration issues by correcting PWA/static assets and service worker caching",
+  "title": "Fix production boot loading and restore valid PWA icon assets",
   "requirements": [
     {
-      "id": "REQ-14",
-      "summary": "Resolve the deployment “System configuration error” by ensuring frontend build inputs and static asset references are valid and deploy-safe.",
+      "id": "REQ-30",
+      "summary": "Ensure production loads the built React bundle (not /src/main.tsx) and always renders a visible boot error into #root instead of a blank page.",
       "acceptanceCriteria": [
-        "A full build+deploy completes without showing “System configuration error”.",
-        "Frontend canister serves the app successfully after deployment (index loads and React mounts).",
-        "Backend canister compiles successfully (Motoko builds without errors)."
+        "In production builds, the site does not request `/src/main.tsx` (verified in browser Network tab).",
+        "Opening `https://bhetghat-fus.caffeine.xyz/#caffeineAdminToken=b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e` renders the app UI instead of a blank white page.",
+        "If the JS bundle fails to load for any reason, a visible error screen is rendered into `#root` (no silent blank page)."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/sw.js",
-          "operation": "modify",
-          "description": "Remove references to non-deployable source paths (e.g., /src/*.tsx, /src/index.css) from any precache list; ensure install/activate/fetch handlers degrade gracefully when an asset is missing so deployment/build does not fail due to cache population issues."
-        },
-        {
-          "path": "frontend/public/offline.html",
-          "operation": "create",
-          "description": "Add a simple offline fallback HTML page under frontend/public that can be served by the service worker when offline navigation occurs, preventing blank screens in production."
-        },
-        {
           "path": "frontend/index.html",
           "operation": "modify",
-          "description": "Validate that all PWA/static asset references (manifest + icons) point to files that exist under frontend/public and match the expected runtime paths; adjust any incorrect references to ensure production deploy serves them correctly."
+          "description": "Update the production entry loading so the React entry is loaded via a Vite-transformable module script (pointing at `/src/main.tsx`) while keeping `entry-loader.js` as a pre-boot script for SW-disable and boot error handling; ensure script ordering supports SW cleanup before app mount."
+        },
+        {
+          "path": "frontend/public/entry-loader.js",
+          "operation": "modify",
+          "description": "Remove any production fallback that attempts to import `/src/main.tsx`; convert to a production-safe pre-boot script that only performs temporary service-worker disable/cleanup and installs a robust global error handler/watchdog that renders an English-only error UI into `#root` if the app bundle fails to execute or mount."
         }
       ]
     },
     {
-      "id": "REQ-15",
-      "summary": "Ensure all PWA manifest/index icon references exist under frontend/public and are correctly located for runtime serving.",
+      "id": "REQ-31",
+      "summary": "Restore valid PNG icon assets at the exact paths referenced by the manifest and index.html.",
       "acceptanceCriteria": [
-        "The following referenced icon paths resolve as static files at runtime (HTTP 200) and are included in the build output: /assets/generated/pwa-icon.dim_192x192.png, /assets/generated/pwa-icon.dim_512x512.png, /assets/generated/pwa-icon-maskable.dim_512x512.png, /assets/generated/favicon.dim_48x48.png, /assets/generated/apple-touch-icon.dim_180x180.png.",
-        "PWA manifest is fetchable at /manifest.webmanifest and contains valid JSON.",
-        "No build-time errors occur due to missing static files referenced by manifest/index.html."
+        "Requesting `/assets/generated/pwa-icon.dim_192x192.png`, `/assets/generated/pwa-icon.dim_512x512.png`, and `/assets/generated/pwa-icon-maskable.dim_512x512.png` returns HTTP 200 and valid PNG content.",
+        "Requesting `/assets/generated/favicon.dim_48x48.png` and `/assets/generated/apple-touch-icon.dim_180x180.png` returns HTTP 200 and valid PNG content.",
+        "Chrome Application tab shows the manifest loads without icon errors/warnings related to invalid images."
       ],
       "file_operations": [
         {
           "path": "frontend/public/assets/generated/pwa-icon.dim_192x192.png",
           "operation": "create",
-          "description": "Add the generated PWA icon asset at this exact path so the manifest reference /assets/generated/pwa-icon.dim_192x192.png resolves at runtime."
+          "description": "Add the required valid PNG asset at `frontend/public/assets/generated/pwa-icon.dim_192x192.png` so the manifest icon reference resolves with HTTP 200."
         },
         {
           "path": "frontend/public/assets/generated/pwa-icon.dim_512x512.png",
           "operation": "create",
-          "description": "Add the generated PWA icon asset at this exact path so the manifest reference /assets/generated/pwa-icon.dim_512x512.png resolves at runtime."
+          "description": "Add the required valid PNG asset at `frontend/public/assets/generated/pwa-icon.dim_512x512.png` so the manifest icon reference resolves with HTTP 200."
         },
         {
           "path": "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png",
           "operation": "create",
-          "description": "Add the generated maskable PWA icon asset at this exact path so the manifest reference /assets/generated/pwa-icon-maskable.dim_512x512.png resolves at runtime."
+          "description": "Add the required valid PNG asset at `frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png` so the manifest icon reference resolves with HTTP 200."
         },
         {
           "path": "frontend/public/assets/generated/favicon.dim_48x48.png",
           "operation": "create",
-          "description": "Add the generated favicon asset at this exact path so the index.html reference /assets/generated/favicon.dim_48x48.png resolves at runtime."
+          "description": "Add the required valid PNG asset at `frontend/public/assets/generated/favicon.dim_48x48.png` so the favicon link in `frontend/index.html` resolves with HTTP 200."
         },
         {
           "path": "frontend/public/assets/generated/apple-touch-icon.dim_180x180.png",
           "operation": "create",
-          "description": "Add the generated Apple touch icon asset at this exact path so the index.html reference /assets/generated/apple-touch-icon.dim_180x180.png resolves at runtime."
+          "description": "Add the required valid PNG asset at `frontend/public/assets/generated/apple-touch-icon.dim_180x180.png` so the Apple touch icon link in `frontend/index.html` resolves with HTTP 200."
         },
         {
           "path": "frontend/public/manifest.webmanifest",
           "operation": "modify",
-          "description": "Confirm icon src paths exactly match the static asset locations under frontend/public/assets/generated and that the JSON remains valid and fetchable at /manifest.webmanifest; adjust only if any paths currently mismatch."
-        },
-        {
-          "path": "frontend/index.html",
-          "operation": "modify",
-          "description": "Confirm the icon link tags and manifest link reference the correct runtime paths and align with files under frontend/public/assets/generated; adjust only if any paths currently mismatch."
+          "description": "Verify the manifest icon entries match the restored files under `frontend/public/assets/generated/` and adjust only if needed to ensure all referenced icon paths and purposes remain correct."
         }
       ]
     },
     {
-      "id": "REQ-16",
-      "summary": "Harden the service worker to avoid precaching non-public source paths and provide reliable offline navigation fallback without causing build/deploy issues.",
+      "id": "REQ-32",
+      "summary": "Add the non-deprecated PWA capability meta tag while keeping existing Apple tags.",
       "acceptanceCriteria": [
-        "Service worker no longer attempts to pre-cache /src/main.tsx, /src/App.tsx, or other non-public build artifacts.",
-        "Service worker install event completes without unhandled promise rejection, even if some assets cannot be cached.",
-        "App still loads normally online; when offline, navigation requests return a functional offline response/page (no blank screen)."
+        "The console no longer reports the deprecation warning about `apple-mobile-web-app-capable` missing `mobile-web-app-capable` (or the warning is reduced to non-actionable informational messages only).",
+        "The app continues to load and function normally after the meta tag change."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/sw.js",
+          "path": "frontend/index.html",
           "operation": "modify",
-          "description": "Update CORE_ASSETS to include only deployable public files (e.g., /, /index.html, /manifest.webmanifest, /offline.html, and generated icons). Change install behavior to cache assets individually (or otherwise tolerate missing assets) so install never fails with unhandled promise rejection. Update navigation fetch handling to return a cached offline page (frontend/public/offline.html) when offline, falling back safely if the offline page is not cached."
-        },
-        {
-          "path": "frontend/public/offline.html",
-          "operation": "modify",
-          "description": "Ensure the offline fallback page is self-contained and functional when served directly by the service worker for offline navigation requests (no blank screen)."
+          "description": "Add `<meta name=\"mobile-web-app-capable\" content=\"yes\">` alongside the existing Apple PWA meta tags, without removing the Apple-specific tags."
         }
       ]
     }

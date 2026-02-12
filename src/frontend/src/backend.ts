@@ -89,10 +89,577 @@ export class ExternalBlob {
         return this;
     }
 }
-export interface backendInterface {
+export interface Message {
+    content: string;
+    sender: Principal;
+    timestamp: bigint;
 }
+export interface DatingProfile {
+    age: number;
+    profilePicUrl: string;
+    interests: Array<string>;
+    bioSections: Array<string>;
+    languages: Array<string>;
+    links: Array<string>;
+    gender: Gender;
+    isVisible: boolean;
+    personalityTraits: Array<string>;
+    datingPreferences: DatingPreferences;
+    socialMedia: Array<string>;
+    lastName: string;
+    location: string;
+    hasVideoChatEnabled: boolean;
+    hobbies: Array<string>;
+    images: Array<string>;
+    firstName: string;
+}
+export interface DatingPreferences {
+    preferredGenders: Array<Gender>;
+    minAge: number;
+    minDistance: bigint;
+    maxAge: number;
+    maxDistance: bigint;
+}
+export enum Gender {
+    other = "other",
+    female = "female",
+    male = "male"
+}
+export enum UserRole {
+    admin = "admin",
+    user = "user",
+    guest = "guest"
+}
+export interface backendInterface {
+    _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
+    assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    createProfile(profile: DatingProfile): Promise<void>;
+    deleteProfile(): Promise<void>;
+    getCallerUserProfile(): Promise<DatingProfile | null>;
+    getCallerUserRole(): Promise<UserRole>;
+    getMessages(entity: Principal): Promise<Array<Message>>;
+    getOwnProfile(): Promise<DatingProfile | null>;
+    getProfiles(): Promise<Array<DatingProfile>>;
+    getPublicProfile(principal: Principal): Promise<DatingProfile | null>;
+    getUserProfile(user: Principal): Promise<DatingProfile | null>;
+    hideProfile(): Promise<boolean>;
+    isCallerAdmin(): Promise<boolean>;
+    likeProfile(liked: Principal): Promise<boolean>;
+    rejectProfile(rejected: Principal): Promise<boolean>;
+    saveCallerUserProfile(profile: DatingProfile): Promise<void>;
+    sendMessage(recipient: Principal, content: string): Promise<boolean>;
+    unmatchProfile(profile: Principal): Promise<boolean>;
+    updateProfile(profile: DatingProfile): Promise<void>;
+}
+import type { DatingPreferences as _DatingPreferences, DatingProfile as _DatingProfile, Gender as _Gender, UserRole as _UserRole } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
+    async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor._initializeAccessControlWithSecret(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor._initializeAccessControlWithSecret(arg0);
+            return result;
+        }
+    }
+    async assignCallerUserRole(arg0: Principal, arg1: UserRole): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n1(this._uploadFile, this._downloadFile, arg1));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.assignCallerUserRole(arg0, to_candid_UserRole_n1(this._uploadFile, this._downloadFile, arg1));
+            return result;
+        }
+    }
+    async createProfile(arg0: DatingProfile): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createProfile(to_candid_DatingProfile_n3(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createProfile(to_candid_DatingProfile_n3(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async deleteProfile(): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.deleteProfile();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.deleteProfile();
+            return result;
+        }
+    }
+    async getCallerUserProfile(): Promise<DatingProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserProfile();
+                return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserProfile();
+            return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getCallerUserRole(): Promise<UserRole> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getCallerUserRole();
+                return from_candid_UserRole_n18(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getCallerUserRole();
+            return from_candid_UserRole_n18(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getMessages(arg0: Principal): Promise<Array<Message>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getMessages(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getMessages(arg0);
+            return result;
+        }
+    }
+    async getOwnProfile(): Promise<DatingProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getOwnProfile();
+                return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getOwnProfile();
+            return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getProfiles(): Promise<Array<DatingProfile>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getProfiles();
+                return from_candid_vec_n20(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getProfiles();
+            return from_candid_vec_n20(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getPublicProfile(arg0: Principal): Promise<DatingProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getPublicProfile(arg0);
+                return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getPublicProfile(arg0);
+            return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async getUserProfile(arg0: Principal): Promise<DatingProfile | null> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.getUserProfile(arg0);
+                return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.getUserProfile(arg0);
+            return from_candid_opt_n10(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async hideProfile(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.hideProfile();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.hideProfile();
+            return result;
+        }
+    }
+    async isCallerAdmin(): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.isCallerAdmin();
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.isCallerAdmin();
+            return result;
+        }
+    }
+    async likeProfile(arg0: Principal): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.likeProfile(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.likeProfile(arg0);
+            return result;
+        }
+    }
+    async rejectProfile(arg0: Principal): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.rejectProfile(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.rejectProfile(arg0);
+            return result;
+        }
+    }
+    async saveCallerUserProfile(arg0: DatingProfile): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.saveCallerUserProfile(to_candid_DatingProfile_n3(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.saveCallerUserProfile(to_candid_DatingProfile_n3(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+    async sendMessage(arg0: Principal, arg1: string): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.sendMessage(arg0, arg1);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.sendMessage(arg0, arg1);
+            return result;
+        }
+    }
+    async unmatchProfile(arg0: Principal): Promise<boolean> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.unmatchProfile(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.unmatchProfile(arg0);
+            return result;
+        }
+    }
+    async updateProfile(arg0: DatingProfile): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.updateProfile(to_candid_DatingProfile_n3(this._uploadFile, this._downloadFile, arg0));
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.updateProfile(to_candid_DatingProfile_n3(this._uploadFile, this._downloadFile, arg0));
+            return result;
+        }
+    }
+}
+function from_candid_DatingPreferences_n15(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _DatingPreferences): DatingPreferences {
+    return from_candid_record_n16(_uploadFile, _downloadFile, value);
+}
+function from_candid_DatingProfile_n11(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _DatingProfile): DatingProfile {
+    return from_candid_record_n12(_uploadFile, _downloadFile, value);
+}
+function from_candid_Gender_n13(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _Gender): Gender {
+    return from_candid_variant_n14(_uploadFile, _downloadFile, value);
+}
+function from_candid_UserRole_n18(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: _UserRole): UserRole {
+    return from_candid_variant_n19(_uploadFile, _downloadFile, value);
+}
+function from_candid_opt_n10(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: [] | [_DatingProfile]): DatingProfile | null {
+    return value.length === 0 ? null : from_candid_DatingProfile_n11(_uploadFile, _downloadFile, value[0]);
+}
+function from_candid_record_n12(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    age: number;
+    profilePicUrl: string;
+    interests: Array<string>;
+    bioSections: Array<string>;
+    languages: Array<string>;
+    links: Array<string>;
+    gender: _Gender;
+    isVisible: boolean;
+    personalityTraits: Array<string>;
+    datingPreferences: _DatingPreferences;
+    socialMedia: Array<string>;
+    lastName: string;
+    location: string;
+    hasVideoChatEnabled: boolean;
+    hobbies: Array<string>;
+    images: Array<string>;
+    firstName: string;
+}): {
+    age: number;
+    profilePicUrl: string;
+    interests: Array<string>;
+    bioSections: Array<string>;
+    languages: Array<string>;
+    links: Array<string>;
+    gender: Gender;
+    isVisible: boolean;
+    personalityTraits: Array<string>;
+    datingPreferences: DatingPreferences;
+    socialMedia: Array<string>;
+    lastName: string;
+    location: string;
+    hasVideoChatEnabled: boolean;
+    hobbies: Array<string>;
+    images: Array<string>;
+    firstName: string;
+} {
+    return {
+        age: value.age,
+        profilePicUrl: value.profilePicUrl,
+        interests: value.interests,
+        bioSections: value.bioSections,
+        languages: value.languages,
+        links: value.links,
+        gender: from_candid_Gender_n13(_uploadFile, _downloadFile, value.gender),
+        isVisible: value.isVisible,
+        personalityTraits: value.personalityTraits,
+        datingPreferences: from_candid_DatingPreferences_n15(_uploadFile, _downloadFile, value.datingPreferences),
+        socialMedia: value.socialMedia,
+        lastName: value.lastName,
+        location: value.location,
+        hasVideoChatEnabled: value.hasVideoChatEnabled,
+        hobbies: value.hobbies,
+        images: value.images,
+        firstName: value.firstName
+    };
+}
+function from_candid_record_n16(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    preferredGenders: Array<_Gender>;
+    minAge: number;
+    minDistance: bigint;
+    maxAge: number;
+    maxDistance: bigint;
+}): {
+    preferredGenders: Array<Gender>;
+    minAge: number;
+    minDistance: bigint;
+    maxAge: number;
+    maxDistance: bigint;
+} {
+    return {
+        preferredGenders: from_candid_vec_n17(_uploadFile, _downloadFile, value.preferredGenders),
+        minAge: value.minAge,
+        minDistance: value.minDistance,
+        maxAge: value.maxAge,
+        maxDistance: value.maxDistance
+    };
+}
+function from_candid_variant_n14(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    other: null;
+} | {
+    female: null;
+} | {
+    male: null;
+}): Gender {
+    return "other" in value ? Gender.other : "female" in value ? Gender.female : "male" in value ? Gender.male : value;
+}
+function from_candid_variant_n19(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+}): UserRole {
+    return "admin" in value ? UserRole.admin : "user" in value ? UserRole.user : "guest" in value ? UserRole.guest : value;
+}
+function from_candid_vec_n17(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_Gender>): Array<Gender> {
+    return value.map((x)=>from_candid_Gender_n13(_uploadFile, _downloadFile, x));
+}
+function from_candid_vec_n20(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<_DatingProfile>): Array<DatingProfile> {
+    return value.map((x)=>from_candid_DatingProfile_n11(_uploadFile, _downloadFile, x));
+}
+function to_candid_DatingPreferences_n7(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: DatingPreferences): _DatingPreferences {
+    return to_candid_record_n8(_uploadFile, _downloadFile, value);
+}
+function to_candid_DatingProfile_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: DatingProfile): _DatingProfile {
+    return to_candid_record_n4(_uploadFile, _downloadFile, value);
+}
+function to_candid_Gender_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Gender): _Gender {
+    return to_candid_variant_n6(_uploadFile, _downloadFile, value);
+}
+function to_candid_UserRole_n1(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): _UserRole {
+    return to_candid_variant_n2(_uploadFile, _downloadFile, value);
+}
+function to_candid_record_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    age: number;
+    profilePicUrl: string;
+    interests: Array<string>;
+    bioSections: Array<string>;
+    languages: Array<string>;
+    links: Array<string>;
+    gender: Gender;
+    isVisible: boolean;
+    personalityTraits: Array<string>;
+    datingPreferences: DatingPreferences;
+    socialMedia: Array<string>;
+    lastName: string;
+    location: string;
+    hasVideoChatEnabled: boolean;
+    hobbies: Array<string>;
+    images: Array<string>;
+    firstName: string;
+}): {
+    age: number;
+    profilePicUrl: string;
+    interests: Array<string>;
+    bioSections: Array<string>;
+    languages: Array<string>;
+    links: Array<string>;
+    gender: _Gender;
+    isVisible: boolean;
+    personalityTraits: Array<string>;
+    datingPreferences: _DatingPreferences;
+    socialMedia: Array<string>;
+    lastName: string;
+    location: string;
+    hasVideoChatEnabled: boolean;
+    hobbies: Array<string>;
+    images: Array<string>;
+    firstName: string;
+} {
+    return {
+        age: value.age,
+        profilePicUrl: value.profilePicUrl,
+        interests: value.interests,
+        bioSections: value.bioSections,
+        languages: value.languages,
+        links: value.links,
+        gender: to_candid_Gender_n5(_uploadFile, _downloadFile, value.gender),
+        isVisible: value.isVisible,
+        personalityTraits: value.personalityTraits,
+        datingPreferences: to_candid_DatingPreferences_n7(_uploadFile, _downloadFile, value.datingPreferences),
+        socialMedia: value.socialMedia,
+        lastName: value.lastName,
+        location: value.location,
+        hasVideoChatEnabled: value.hasVideoChatEnabled,
+        hobbies: value.hobbies,
+        images: value.images,
+        firstName: value.firstName
+    };
+}
+function to_candid_record_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    preferredGenders: Array<Gender>;
+    minAge: number;
+    minDistance: bigint;
+    maxAge: number;
+    maxDistance: bigint;
+}): {
+    preferredGenders: Array<_Gender>;
+    minAge: number;
+    minDistance: bigint;
+    maxAge: number;
+    maxDistance: bigint;
+} {
+    return {
+        preferredGenders: to_candid_vec_n9(_uploadFile, _downloadFile, value.preferredGenders),
+        minAge: value.minAge,
+        minDistance: value.minDistance,
+        maxAge: value.maxAge,
+        maxDistance: value.maxDistance
+    };
+}
+function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
+    admin: null;
+} | {
+    user: null;
+} | {
+    guest: null;
+} {
+    return value == UserRole.admin ? {
+        admin: null
+    } : value == UserRole.user ? {
+        user: null
+    } : value == UserRole.guest ? {
+        guest: null
+    } : value;
+}
+function to_candid_variant_n6(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Gender): {
+    other: null;
+} | {
+    female: null;
+} | {
+    male: null;
+} {
+    return value == Gender.other ? {
+        other: null
+    } : value == Gender.female ? {
+        female: null
+    } : value == Gender.male ? {
+        male: null
+    } : value;
+}
+function to_candid_vec_n9(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Array<Gender>): Array<_Gender> {
+    return value.map((x)=>to_candid_Gender_n5(_uploadFile, _downloadFile, x));
 }
 export interface CreateActorOptions {
     agent?: Agent;

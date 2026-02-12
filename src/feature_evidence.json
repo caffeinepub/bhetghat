@@ -2,40 +2,41 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-identify-and-fix-the-root-cause-of-the-deployment-build-failure-reported-as-a-system-configuration-error-by-validating-the-project-s-build-inputs-frontend-static-asset-references-backend-canister-compilation-and-making-any-necessary-code-config-adjustments-so-the-app-builds-and-deploys-successfully",
-      "featureTitle": "Identify and fix the root cause of the deployment/build failure reported as a “System configuration error” by validating the project’s build inputs (frontend static asset references + backend canister compilation) and making any necessary code/config adjustments so the app builds and deploys successfully.",
+      "featureId": "feature-fix-the-production-startup-path-so-the-deployed-app-never-attempts-to-import-the-dev-only-entry-src-main-tsx-in-production-and-the-react-app-reliably-mounts-renders-welcome-or-authenticated-ui-when-opening-the-live-url-https-bhetghat-fus-caffeine-xyz-caffeineadmintoken-b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e",
+      "featureTitle": "Fix the production startup path so the deployed app never attempts to import the dev-only entry `/src/main.tsx` in production, and the React app reliably mounts (renders Welcome or authenticated UI) when opening the live URL `https://bhetghat-fus.caffeine.xyz/#caffeineAdminToken=b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e`.",
       "files": [
-        "frontend/public/offline.html",
-        "frontend/public/sw.js"
+        "frontend/index.html",
+        "frontend/public/entry-loader.js"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-14"
+        "REQ-30"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-harden-the-service-worker-cache-list-in-frontend-public-sw-js-to-avoid-caching-non-deployable-source-paths-e-g-src-tsx-and-ensure-offline-fallback-behavior-does-not-cause-build-deploy-issues-when-assets-are-missing-or-paths-differ-between-dev-and-production-builds",
-      "featureTitle": "Harden the service worker cache list in frontend/public/sw.js to avoid caching non-deployable source paths (e.g., /src/*.tsx) and ensure offline fallback behavior does not cause build/deploy issues when assets are missing or paths differ between dev and production builds.",
+      "featureId": "feature-update-pwa-meta-tags-in-frontend-index-html-to-address-the-deprecation-warning-by-including-meta-name-mobile-web-app-capable-content-yes-while-keeping-existing-apple-tags-as-needed",
+      "featureTitle": "Update PWA meta tags in `frontend/index.html` to address the deprecation warning by including `<meta name=\"mobile-web-app-capable\" content=\"yes\">` (while keeping existing Apple tags as needed).",
       "files": [
-        "frontend/public/offline.html",
-        "frontend/public/sw.js"
+        "frontend/index.html"
       ],
       "components": [
         "core-infrastructure@1.0.2",
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0"
       ],
       "testIds": [
-        "REQ-16"
+        "REQ-32"
       ],
       "confidence": "high"
     }

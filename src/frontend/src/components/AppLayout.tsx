@@ -15,7 +15,7 @@ import { useState } from 'react';
 
 interface AppLayoutProps {
   children: ReactNode;
-  currentPage?: 'home' | 'matches' | 'profile' | 'settings' | 'install';
+  currentPage?: 'home' | 'matches' | 'profile' | 'settings' | 'install' | 'chat';
   onNavigate?: (page: string) => void;
 }
 

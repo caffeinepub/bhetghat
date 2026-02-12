@@ -10,7 +10,64 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface _SERVICE {}
+export interface DatingPreferences {
+  'preferredGenders' : Array<Gender>,
+  'minAge' : number,
+  'minDistance' : bigint,
+  'maxAge' : number,
+  'maxDistance' : bigint,
+}
+export interface DatingProfile {
+  'age' : number,
+  'profilePicUrl' : string,
+  'interests' : Array<string>,
+  'bioSections' : Array<string>,
+  'languages' : Array<string>,
+  'links' : Array<string>,
+  'gender' : Gender,
+  'isVisible' : boolean,
+  'personalityTraits' : Array<string>,
+  'datingPreferences' : DatingPreferences,
+  'socialMedia' : Array<string>,
+  'lastName' : string,
+  'location' : string,
+  'hasVideoChatEnabled' : boolean,
+  'hobbies' : Array<string>,
+  'images' : Array<string>,
+  'firstName' : string,
+}
+export type Gender = { 'other' : null } |
+  { 'female' : null } |
+  { 'male' : null };
+export interface Message {
+  'content' : string,
+  'sender' : Principal,
+  'timestamp' : bigint,
+}
+export type UserRole = { 'admin' : null } |
+  { 'user' : null } |
+  { 'guest' : null };
+export interface _SERVICE {
+  '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
+  'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'createProfile' : ActorMethod<[DatingProfile], undefined>,
+  'deleteProfile' : ActorMethod<[], undefined>,
+  'getCallerUserProfile' : ActorMethod<[], [] | [DatingProfile]>,
+  'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getMessages' : ActorMethod<[Principal], Array<Message>>,
+  'getOwnProfile' : ActorMethod<[], [] | [DatingProfile]>,
+  'getProfiles' : ActorMethod<[], Array<DatingProfile>>,
+  'getPublicProfile' : ActorMethod<[Principal], [] | [DatingProfile]>,
+  'getUserProfile' : ActorMethod<[Principal], [] | [DatingProfile]>,
+  'hideProfile' : ActorMethod<[], boolean>,
+  'isCallerAdmin' : ActorMethod<[], boolean>,
+  'likeProfile' : ActorMethod<[Principal], boolean>,
+  'rejectProfile' : ActorMethod<[Principal], boolean>,
+  'saveCallerUserProfile' : ActorMethod<[DatingProfile], undefined>,
+  'sendMessage' : ActorMethod<[Principal, string], boolean>,
+  'unmatchProfile' : ActorMethod<[Principal], boolean>,
+  'updateProfile' : ActorMethod<[DatingProfile], undefined>,
+}
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];
 export declare const idlFactory: IDL.InterfaceFactory;

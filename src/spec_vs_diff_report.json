@@ -1,57 +1,63 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T14:31:19.729Z",
-  "summary": "REQ-16 is partially addressed by updating the service worker to avoid precaching /src paths and to tolerate missing assets with an offline fallback. However, REQ-15 static icon file presence cannot be confirmed from the diff (no icon assets added), and REQ-14 backend build/deploy root-cause validation/fixes are not evidenced (no backend or deployment config changes shown). Additionally, new user-facing Nepali text was introduced despite the request to use English for user-facing additions/changes.",
+  "generatedAt": "2026-02-12T15:32:13.527Z",
+  "summary": "REQ-32 appears implemented via the new mobile-web-app-capable meta tag. REQ-30 is not fully met because the HTML still directly loads /src/main.tsx, which would cause production to request a dev-only path. REQ-31 cannot be confirmed from the diff because no actual PNG icon assets are shown as added/validated—only references/links were updated. The diff also includes multiple substantial new UI/features (i18n, offline UI, language toggle, expanded pages) that were not requested and may violate the “no new product features” constraint.",
   "missing_requirements": [
     {
-      "id": "REQ-14",
-      "requirement": "Identify and fix the root cause of the deployment/build failure (“System configuration error”) by validating build inputs (frontend static asset references + backend canister compilation) and making necessary adjustments so build+deploy succeeds and backend compiles.",
-      "reason": "The diff summary shows changes limited to frontend offline/service-worker assets and a project state description; there is no evidence of backend compilation fixes, canister configuration/build pipeline changes, or a demonstrated root-cause fix for the deployment error.",
+      "id": "REQ-30",
+      "requirement": "Fix the production startup path so the deployed app never attempts to import the dev-only entry `/src/main.tsx` in production, and the React app reliably mounts in production.",
+      "reason": "The modified `frontend/index.html` still includes a module script with `src='/src/main.tsx'`, which would cause the browser to request `/src/main.tsx` (dev-only) when opening the production URL.",
       "evidence": [
-        "file-diff shows no backend/* changes; only frontend/public/offline.html, frontend/public/sw.js, project_state.json, frontend-file-summaries.txt"
+        "frontend/index.html"
       ]
     },
     {
-      "id": "REQ-15",
-      "requirement": "Ensure all files referenced by PWA configuration are present under frontend/public, specifically the listed generated icons referenced by manifest/index.html, and ensure manifest is fetchable and valid JSON.",
-      "reason": "The service worker references the required icon paths, but the diff does not show the actual icon files being added under frontend/public/assets/generated (or any manifest/index.html updates confirming references). Therefore, presence/location of those assets and manifest correctness cannot be verified from the provided diff summary.",
+      "id": "REQ-31",
+      "requirement": "Ensure all icon files referenced by `frontend/public/manifest.webmanifest` and `frontend/index.html` exist under `frontend/public/assets/generated/` and are valid PNGs served with HTTP 200.",
+      "reason": "The diff summary shows updated references to icon paths, but does not show the PNG files themselves being added or modified under `frontend/public/assets/generated/`, so existence/validity cannot be verified from the provided changes.",
       "evidence": [
-        "frontend/public/sw.js (CORE_ASSETS includes /assets/generated/*.png)",
-        "No added/modified files shown for frontend/public/manifest.webmanifest or frontend/index.html contents; no added icon files under frontend/public/assets/generated/*"
-      ]
-    },
-    {
-      "requirement": "Use English for any user-facing text added or changed as part of this fix request.",
-      "reason": "New offline user-facing content includes Nepali text (and mixed-language button label), which violates the stated constraint.",
-      "evidence": [
-        "frontend/public/offline.html (contains Nepali paragraphs and “Retry / पुन: प्रयास गर्नुहोस्”)",
-        "frontend/public/sw.js (inline offline HTML includes Nepali text)"
+        "frontend/index.html",
+        "frontend/public/manifest.webmanifest",
+        "frontend-file-summaries.txt"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Bilingual (English+Nepali) offline fallback page and mixed-language UI copy (including Nepali text and emoji/animation styling).",
-      "reason": "REQ-16 asks for offline fallback behavior, but does not request adding Nepali/localized copy or bilingual/mixed-language messaging; additionally it conflicts with the constraint to add/change user-facing text in English only for this fix.",
+      "description": "Added/expanded bilingual (English/Nepali) i18n system, including translation dictionaries and language persistence provider.",
+      "reason": "BuildRequest focuses on fixing blank page (prod entry loading) and PWA icon/meta issues; i18n expansion is not requested and is a new product capability beyond what is necessary for those fixes.",
       "evidence": [
-        "frontend/public/offline.html",
-        "frontend/public/sw.js (inline offline HTML includes Nepali text)"
+        "frontend-file-summaries.txt (frontend/src/i18n/translations.ts, frontend/src/i18n/I18nProvider.tsx)"
       ]
     },
     {
-      "description": "Project state updated to describe new dating app functionality (swipe matching, chat, ads, etc.).",
-      "reason": "The BuildRequest explicitly lists as non-goals implementing new dating app features beyond what’s required to resolve the build/deploy error; the updated project_state summary introduces/claims such features.",
+      "description": "Added a user-facing Language Toggle UI component.",
+      "reason": "Not requested by REQ-30/31/32 and falls under “Do not add new product features … beyond what is necessary”.",
       "evidence": [
-        "project_state.json (summary mentions swipe matching, detailed profiles, chat after matching, advertisement space)"
+        "frontend-file-summaries.txt (frontend/src/components/LanguageToggle.tsx)"
+      ]
+    },
+    {
+      "description": "Added/expanded offline UX components/pages (offline hook, OfflineState component, offline.html).",
+      "reason": "Not requested as part of fixing production entry loading or PWA icon/meta issues.",
+      "evidence": [
+        "frontend-file-summaries.txt (frontend/src/hooks/useOnlineStatus.ts, frontend/src/components/OfflineState.tsx, frontend/public/offline.html)"
+      ]
+    },
+    {
+      "description": "Mentions/service-worker-related offline support registration in the React entry point.",
+      "reason": "BuildRequest non-goal says not to re-enable service worker caching behavior; the diff summary indicates `frontend/src/main.tsx` includes SW registration for offline support (even if SW is currently in disable mode, this is additional behavior not requested for REQ-30/31/32).",
+      "evidence": [
+        "frontend-file-summaries.txt (frontend/src/main.tsx)"
       ]
     }
   ],
   "confidence": 0.74,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/public/offline.html",
-    "frontend/public/sw.js",
+    "frontend/index.html",
+    "frontend/public/entry-loader.js",
     "project_state.json"
   ]
 }

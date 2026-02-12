@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T14:31:19.732Z",
+  "generatedAt": "2026-02-12T15:32:13.530Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -11,22 +11,21 @@
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-14",
-        "summary": "Identify and fix the root cause of the deployment/build failure reported as a “System configuration error” by validating the project’s build inputs (frontend static asset references + backend canister compilation) and making any necessary code/config adjustments so the app builds and deploys successfully.",
+        "id": "REQ-30",
+        "summary": "Fix the production startup path so the deployed app never attempts to import the dev-only entry `/src/main.tsx` in production, and the React app reliably mounts (renders Welcome or authenticated UI) when opening the live URL `https://bhetghat-fus.caffeine.xyz/#caffeineAdminToken=b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e`.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/public/sw.js",
-          "frontend/public/offline.html",
-          "frontend/index.html"
+          "frontend/index.html",
+          "frontend/public/entry-loader.js"
         ],
         "matchedFiles": [
-          "frontend/public/sw.js",
-          "frontend/public/offline.html"
+          "frontend/index.html",
+          "frontend/public/entry-loader.js"
         ]
       },
       {
-        "id": "REQ-15",
-        "summary": "Ensure all files referenced by PWA configuration are present and correctly located under frontend/public (manifest + index.html), specifically all icon files referenced by frontend/public/manifest.webmanifest and frontend/index.html.",
+        "id": "REQ-31",
+        "summary": "Resolve the manifest icon download/validation error by ensuring all icon files referenced by `frontend/public/manifest.webmanifest` and `frontend/index.html` exist under `frontend/public/assets/generated/` and are valid PNG images served with a successful HTTP response.",
         "status": "missing",
         "plannedFiles": [
           "frontend/public/assets/generated/pwa-icon.dim_192x192.png",
@@ -34,34 +33,35 @@
           "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png",
           "frontend/public/assets/generated/favicon.dim_48x48.png",
           "frontend/public/assets/generated/apple-touch-icon.dim_180x180.png",
-          "frontend/public/manifest.webmanifest",
-          "frontend/index.html"
+          "frontend/public/manifest.webmanifest"
         ],
         "matchedFiles": []
       },
       {
-        "id": "REQ-16",
-        "summary": "Harden the service worker cache list in frontend/public/sw.js to avoid caching non-deployable source paths (e.g., /src/*.tsx) and ensure offline fallback behavior does not cause build/deploy issues when assets are missing or paths differ between dev and production builds.",
+        "id": "REQ-32",
+        "summary": "Update PWA meta tags in `frontend/index.html` to address the deprecation warning by including `<meta name=\"mobile-web-app-capable\" content=\"yes\">` (while keeping existing Apple tags as needed).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/public/sw.js",
-          "frontend/public/offline.html"
+          "frontend/index.html"
         ],
         "matchedFiles": [
-          "frontend/public/sw.js",
-          "frontend/public/offline.html"
+          "frontend/index.html"
         ]
       }
     ]
   },
   "changedFiles": [
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/offline.html",
-    "frontend/public/sw.js",
+    "frontend/index.html",
+    "frontend/public/assets/generated/apple-touch-icon.dim_180x180.png, 180x180",
+    "frontend/public/assets/generated/favicon.dim_48x48.png, 48x48",
+    "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png, 512x512",
+    "frontend/public/assets/generated/pwa-icon.dim_192x192.png, 192x192",
+    "frontend/public/assets/generated/pwa-icon.dim_512x512.png, 512x512",
+    "frontend/public/entry-loader.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -8,10 +8,152 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const idlService = IDL.Service({});
+export const UserRole = IDL.Variant({
+  'admin' : IDL.Null,
+  'user' : IDL.Null,
+  'guest' : IDL.Null,
+});
+export const Gender = IDL.Variant({
+  'other' : IDL.Null,
+  'female' : IDL.Null,
+  'male' : IDL.Null,
+});
+export const DatingPreferences = IDL.Record({
+  'preferredGenders' : IDL.Vec(Gender),
+  'minAge' : IDL.Nat8,
+  'minDistance' : IDL.Nat,
+  'maxAge' : IDL.Nat8,
+  'maxDistance' : IDL.Nat,
+});
+export const DatingProfile = IDL.Record({
+  'age' : IDL.Nat8,
+  'profilePicUrl' : IDL.Text,
+  'interests' : IDL.Vec(IDL.Text),
+  'bioSections' : IDL.Vec(IDL.Text),
+  'languages' : IDL.Vec(IDL.Text),
+  'links' : IDL.Vec(IDL.Text),
+  'gender' : Gender,
+  'isVisible' : IDL.Bool,
+  'personalityTraits' : IDL.Vec(IDL.Text),
+  'datingPreferences' : DatingPreferences,
+  'socialMedia' : IDL.Vec(IDL.Text),
+  'lastName' : IDL.Text,
+  'location' : IDL.Text,
+  'hasVideoChatEnabled' : IDL.Bool,
+  'hobbies' : IDL.Vec(IDL.Text),
+  'images' : IDL.Vec(IDL.Text),
+  'firstName' : IDL.Text,
+});
+export const Message = IDL.Record({
+  'content' : IDL.Text,
+  'sender' : IDL.Principal,
+  'timestamp' : IDL.Int,
+});
+
+export const idlService = IDL.Service({
+  '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+  'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'createProfile' : IDL.Func([DatingProfile], [], []),
+  'deleteProfile' : IDL.Func([], [], []),
+  'getCallerUserProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
+  'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getMessages' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], []),
+  'getOwnProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
+  'getProfiles' : IDL.Func([], [IDL.Vec(DatingProfile)], ['query']),
+  'getPublicProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(DatingProfile)],
+      ['query'],
+    ),
+  'getUserProfile' : IDL.Func(
+      [IDL.Principal],
+      [IDL.Opt(DatingProfile)],
+      ['query'],
+    ),
+  'hideProfile' : IDL.Func([], [IDL.Bool], []),
+  'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'likeProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
+  'rejectProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
+  'saveCallerUserProfile' : IDL.Func([DatingProfile], [], []),
+  'sendMessage' : IDL.Func([IDL.Principal, IDL.Text], [IDL.Bool], []),
+  'unmatchProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
+  'updateProfile' : IDL.Func([DatingProfile], [], []),
+});
 
 export const idlInitArgs = [];
 
-export const idlFactory = ({ IDL }) => { return IDL.Service({}); };
+export const idlFactory = ({ IDL }) => {
+  const UserRole = IDL.Variant({
+    'admin' : IDL.Null,
+    'user' : IDL.Null,
+    'guest' : IDL.Null,
+  });
+  const Gender = IDL.Variant({
+    'other' : IDL.Null,
+    'female' : IDL.Null,
+    'male' : IDL.Null,
+  });
+  const DatingPreferences = IDL.Record({
+    'preferredGenders' : IDL.Vec(Gender),
+    'minAge' : IDL.Nat8,
+    'minDistance' : IDL.Nat,
+    'maxAge' : IDL.Nat8,
+    'maxDistance' : IDL.Nat,
+  });
+  const DatingProfile = IDL.Record({
+    'age' : IDL.Nat8,
+    'profilePicUrl' : IDL.Text,
+    'interests' : IDL.Vec(IDL.Text),
+    'bioSections' : IDL.Vec(IDL.Text),
+    'languages' : IDL.Vec(IDL.Text),
+    'links' : IDL.Vec(IDL.Text),
+    'gender' : Gender,
+    'isVisible' : IDL.Bool,
+    'personalityTraits' : IDL.Vec(IDL.Text),
+    'datingPreferences' : DatingPreferences,
+    'socialMedia' : IDL.Vec(IDL.Text),
+    'lastName' : IDL.Text,
+    'location' : IDL.Text,
+    'hasVideoChatEnabled' : IDL.Bool,
+    'hobbies' : IDL.Vec(IDL.Text),
+    'images' : IDL.Vec(IDL.Text),
+    'firstName' : IDL.Text,
+  });
+  const Message = IDL.Record({
+    'content' : IDL.Text,
+    'sender' : IDL.Principal,
+    'timestamp' : IDL.Int,
+  });
+  
+  return IDL.Service({
+    '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
+    'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createProfile' : IDL.Func([DatingProfile], [], []),
+    'deleteProfile' : IDL.Func([], [], []),
+    'getCallerUserProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
+    'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getMessages' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], []),
+    'getOwnProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
+    'getProfiles' : IDL.Func([], [IDL.Vec(DatingProfile)], ['query']),
+    'getPublicProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(DatingProfile)],
+        ['query'],
+      ),
+    'getUserProfile' : IDL.Func(
+        [IDL.Principal],
+        [IDL.Opt(DatingProfile)],
+        ['query'],
+      ),
+    'hideProfile' : IDL.Func([], [IDL.Bool], []),
+    'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'likeProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
+    'rejectProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
+    'saveCallerUserProfile' : IDL.Func([DatingProfile], [], []),
+    'sendMessage' : IDL.Func([IDL.Principal, IDL.Text], [IDL.Bool], []),
+    'unmatchProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
+    'updateProfile' : IDL.Func([DatingProfile], [], []),
+  });
+};
 
 export const init = ({ IDL }) => { return []; };

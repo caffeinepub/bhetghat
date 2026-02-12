@@ -1,0 +1,19 @@
+{
+  "frontend/index.html": "HTML entry point with PWA manifest link, theme color meta tags, and Apple PWA configuration for installability.",
+  "frontend/public/manifest.webmanifest": "PWA manifest defining app name, icons, display mode (standalone), theme colors, and scope for installable web app.",
+  "frontend/public/sw.js": "Service worker implementing offline-first caching with individual asset caching to tolerate missing files, proper offline fallback handling, and no references to non-public source files.",
+  "frontend/src/main.tsx": "Application entry point wrapping the app with QueryClient, InternetIdentity, Theme, and I18n providers, plus service worker registration for production.",
+  "frontend/src/i18n/translations.ts": "Bilingual translation dictionary containing all English and Nepali UI strings for the app.",
+  "frontend/src/i18n/I18nProvider.tsx": "React context provider managing language state (English/Nepali) with localStorage persistence and translation helper function.",
+  "frontend/src/hooks/useOnlineStatus.ts": "Custom hook tracking browser online/offline status using navigator.onLine and window events.",
+  "frontend/src/components/OfflineState.tsx": "Bilingual offline screen component displayed when network connection is unavailable.",
+  "frontend/src/components/LanguageToggle.tsx": "Dropdown menu component allowing users to switch between English and Nepali languages.",
+  "frontend/src/components/AppLayout.tsx": "Main layout wrapper with header (logo, language toggle, auth buttons, mobile menu), content area, and footer with attribution.",
+  "frontend/src/pages/InstallHelp.tsx": "Bilingual installation instructions page with accordion sections for Android and iOS add-to-home-screen steps.",
+  "frontend/src/pages/Welcome.tsx": "Landing page with app features, motto, and login prompt for unauthenticated users.",
+  "frontend/src/App.tsx": "Root app component managing routing between Welcome, InstallHelp, and authenticated views with offline detection and properly typed page state.",
+  "frontend/src/index.css": "Global styles with OKLCH-based pink/rose color theme for light and dark modes, plus mobile-friendly touch targets and safe area insets.",
+  "frontend/tailwind.config.js": "Tailwind configuration extending theme with custom colors, border radius, shadows, and mobile-first container settings.",
+  "frontend/src/hooks/useQueries.ts": "Placeholder file for future React Query hooks when backend dating features are implemented.",
+  "frontend/public/offline.html": "Standalone bilingual (English/Nepali) offline fallback page with styled layout, animations, and retry button for when the app is accessed without internet connection."
+}

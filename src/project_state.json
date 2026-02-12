@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 7,
+  "summary": "Building “Bhetghat”, a free bilingual (English+Nepali) Nepali dating web app similar to Tinder, with swipe matching, detailed profiles, chat after matching, advertisement space, and optimized as an installable PWA (Add to Home Screen) since App Store/Play Store distribution and Nepali wallet payments aren’t supported.",
+  "architectural_notes": [
+    "Payments disabled: no eSewa/Khalti/Nepali banking wallets; build as free app without requiring credit card/Stripe.",
+    "Target is a mobile-friendly web app (not native Android/iOS). Provide installable experience via PWA/Add to Home Screen (not App Store/Play Store).",
+    "Platform constraint: cannot use Supabase/Node-style server routes; backend must run on Internet Computer (Motoko), so Khalti/eSewa integrations are not supported here."
+  ],
+  "known_issues": [
+    "Deployment/build failing with a 'System configuration error' (platform-level build issue)."
+  ],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-configure-the-bhetghat-web-app-as-an-installable-progressive-web-app-pwa-so-users-on-android-chrome-and-ios-safari-can-add-it-to-their-home-screen-and-launch-it-full-screen",
+      "title": "Configure the Bhetghat web app as an installable Progressive Web App (PWA) so users on Android (Chrome) and iOS (Safari) can add it to their home screen and launch it full-screen.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-basic-offline-support-for-the-pwa-shell-using-a-service-worker-so-the-app-can-start-and-show-a-friendly-offline-screen-message-when-the-network-is-unavailable",
+      "title": "Add basic offline support for the PWA shell using a service worker so the app can start and show a friendly offline screen/message when the network is unavailable.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-in-app-install-entry-point-that-explains-in-both-english-and-nepali-how-to-install-the-app-on-android-and-iphone-add-to-home-screen",
+      "title": "Add an in-app “Install” entry point that explains, in both English and Nepali, how to install the app on Android and iPhone (Add to Home Screen).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-bilingual-english-nepali-ui-text-support-across-the-app-with-a-user-accessible-language-toggle-and-a-default-language-selection",
+      "title": "Implement bilingual (English + Nepali) UI text support across the app with a user-accessible language toggle and a default language selection.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-distinct-visual-theme-for-bhetghat-colors-typography-spacing-and-component-styling-and-apply-it-consistently-across-all-screens",
+      "title": "Create a coherent, distinct visual theme for Bhetghat (colors, typography, spacing, and component styling) and apply it consistently across all screens.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-authenticated-onboarding-flow-in-the-frontend-that-prompts-logged-in-users-to-create-their-profile-if-they-do-not-have-one-yet-and-prevents-access-to-matching-chat-until-onboarding-is-complete",
+      "title": "Add an authenticated onboarding flow in the frontend that prompts logged-in users to create their profile if they do not have one yet, and prevents access to matching/chat until onboarding is complete.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-tinder-style-discovery-and-swipe-actions-show-a-stack-list-of-candidate-profiles-and-let-users-like-or-pass-persist-these-actions-and-create-a-match-when-both-users-like-each-other",
+      "title": "Implement Tinder-style discovery and swipe actions: show a stack/list of candidate profiles and let users Like or Pass; persist these actions and create a Match when both users Like each other.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-matches-page-that-lists-matches-for-the-logged-in-user-and-allows-opening-a-chat-thread-with-a-selected-match",
+      "title": "Implement a Matches page that lists matches for the logged-in user and allows opening a chat thread with a selected match.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-chat-messaging-that-is-only-available-between-matched-users-including-sending-messages-and-loading-message-history-via-backend-apis-no-real-time-sockets",
+      "title": "Implement chat messaging that is only available between matched users, including sending messages and loading message history via backend APIs (no real-time sockets).",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-a-profile-page-for-viewing-and-editing-the-logged-in-user-s-profile-and-ensure-navigation-entries-home-matches-profile-settings-lead-to-functional-screens-rather-than-the-current-placeholder",
+      "title": "Implement a Profile page for viewing and editing the logged-in user’s profile, and ensure navigation entries (Home/Matches/Profile/Settings) lead to functional screens rather than the current placeholder.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-advertisement-placement-slots-in-the-ui-as-non-interactive-placeholders-images-to-be-provided-later-and-ensure-they-do-not-block-core-matching-chat-flows",
+      "title": "Add advertisement placement slots in the UI as non-interactive placeholders (images to be provided later), and ensure they do not block core matching/chat flows.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-include-required-pwa-icon-assets-as-static-files-under-frontend-public-assets-generated-matching-the-filenames-already-referenced-by-the-manifest-and-index-html",
+      "title": "Generate and include required PWA icon assets as static files under frontend/public/assets/generated, matching the filenames already referenced by the manifest and index.html.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-identify-and-fix-the-root-cause-of-the-deployment-build-failure-reported-as-a-system-configuration-error-by-validating-the-project-s-build-inputs-frontend-static-asset-references-backend-canister-compilation-and-making-any-necessary-code-config-adjustments-so-the-app-builds-and-deploys-successfully",
+      "title": "Identify and fix the root cause of the deployment/build failure reported as a “System configuration error” by validating the project’s build inputs (frontend static asset references + backend canister compilation) and making any necessary code/config adjustments so the app builds and deploys successfully.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-harden-the-service-worker-cache-list-in-frontend-public-sw-js-to-avoid-caching-non-deployable-source-paths-e-g-src-tsx-and-ensure-offline-fallback-behavior-does-not-cause-build-deploy-issues-when-assets-are-missing-or-paths-differ-between-dev-and-production-builds",
+      "title": "Harden the service worker cache list in frontend/public/sw.js to avoid caching non-deployable source paths (e.g., /src/*.tsx) and ensure offline fallback behavior does not cause build/deploy issues when assets are missing or paths differ between dev and production builds.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create Bhetghat dating app (Tinder-like) with account creation/login and onboarding",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Tinder-style swipe matching and match logic",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Detailed profile fields/options (rich profile choices)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Chat/messaging unlocked after matching",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Advertisement placement/slots within the app (upload images later)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Bilingual UI support (English and Nepali)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Make the web app installable as a PWA (Add to Home Screen) with mobile-optimized UX",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Implement backend data models and APIs for user profiles, using the authenticated Internet Identity Principal as the user identifier.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Ensure all files referenced by PWA configuration are present and correctly located under frontend/public (manifest + index.html), specifically all icon files referenced by frontend/public/manifest.webmanifest and frontend/index.html.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Bhetghat",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

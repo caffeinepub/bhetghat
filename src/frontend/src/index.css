@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.75rem;
+        
+        /* Bhetghat Pink/Rose Theme - Light Mode */
+        --background: 0.99 0.005 10;
+        --foreground: 0.2 0.02 10;
+        
+        --card: 1 0 0;
+        --card-foreground: 0.2 0.02 10;
+        
+        --popover: 1 0 0;
+        --popover-foreground: 0.2 0.02 10;
+        
+        --primary: 0.55 0.22 355;
+        --primary-foreground: 0.99 0.005 10;
+        
+        --secondary: 0.96 0.015 355;
+        --secondary-foreground: 0.2 0.02 10;
+        
+        --muted: 0.96 0.01 10;
+        --muted-foreground: 0.5 0.015 10;
+        
+        --accent: 0.94 0.025 355;
+        --accent-foreground: 0.2 0.02 10;
+        
+        --destructive: 0.55 0.24 25;
+        --destructive-foreground: 0.99 0.005 10;
+        
+        --border: 0.92 0.01 10;
+        --input: 0.92 0.01 10;
+        --ring: 0.55 0.22 355;
+        
+        --chart-1: 0.55 0.22 355;
+        --chart-2: 0.65 0.18 30;
+        --chart-3: 0.6 0.15 280;
+        --chart-4: 0.7 0.12 160;
+        --chart-5: 0.5 0.2 200;
+    }
+
+    .dark {
+        --background: 0.15 0.015 10;
+        --foreground: 0.95 0.01 10;
+        
+        --card: 0.2 0.02 10;
+        --card-foreground: 0.95 0.01 10;
+        
+        --popover: 0.18 0.02 10;
+        --popover-foreground: 0.95 0.01 10;
+        
+        --primary: 0.65 0.22 355;
+        --primary-foreground: 0.15 0.015 10;
+        
+        --secondary: 0.25 0.025 355;
+        --secondary-foreground: 0.95 0.01 10;
+        
+        --muted: 0.25 0.02 10;
+        --muted-foreground: 0.65 0.015 10;
+        
+        --accent: 0.3 0.03 355;
+        --accent-foreground: 0.95 0.01 10;
+        
+        --destructive: 0.6 0.24 25;
+        --destructive-foreground: 0.15 0.015 10;
+        
+        --border: 0.3 0.02 10;
+        --input: 0.3 0.02 10;
+        --ring: 0.65 0.22 355;
+        
+        --chart-1: 0.65 0.22 355;
+        --chart-2: 0.7 0.18 30;
+        --chart-3: 0.65 0.15 280;
+        --chart-4: 0.75 0.12 160;
+        --chart-5: 0.6 0.2 200;
+    }
+
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+        font-feature-settings: "rlig" 1, "calt" 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    /* Touch-friendly tap targets */
+    button, a, [role="button"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+    
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Safe area insets for notched devices */
+    @supports (padding: max(0px)) {
+        body {
+            padding-left: max(0px, env(safe-area-inset-left));
+            padding-right: max(0px, env(safe-area-inset-right));
+        }
+    }
+}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d91e5a">
+  <title>Offline - Bhetghat</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      background: linear-gradient(135deg, #fce7f3 0%, #fff1f2 50%, #fff 100%);
+      padding: 1rem;
+    }
+    
+    .offline-container { 
+      text-align: center; 
+      padding: 3rem 2rem; 
+      background: white;
+      border-radius: 1.5rem;
+      box-shadow: 0 10px 25px rgba(217, 30, 90, 0.1);
+      max-width: 500px;
+      width: 100%;
+    }
+    
+    .emoji {
+      font-size: 5rem;
+      margin-bottom: 1.5rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    h1 { 
+      color: #d91e5a; 
+      margin: 0 0 1rem 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      color: #be185d;
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+    }
+    
+    p { 
+      color: #64748b; 
+      margin: 0.75rem 0;
+      line-height: 1.7;
+      font-size: 1rem;
+    }
+    
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, #fda4af, transparent);
+      margin: 1.5rem 0;
+    }
+    
+    .retry-button {
+      margin-top: 2rem;
+      padding: 0.875rem 2rem;
+      background: #d91e5a;
+      color: white;
+      border: none;
+      border-radius: 0.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 4px 12px rgba(217, 30, 90, 0.3);
+    }
+    
+    .retry-button:hover {
+      background: #be185d;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(217, 30, 90, 0.4);
+    }
+    
+    .retry-button:active {
+      transform: translateY(0);
+    }
+    
+    @media (max-width: 640px) {
+      .offline-container {
+        padding: 2rem 1.5rem;
+      }
+      
+      .emoji {
+        font-size: 4rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+      
+      .subtitle {
+        font-size: 1.125rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="offline-container">
+    <div class="emoji">📵</div>
+    <h1>Offline</h1>
+    <p class="subtitle">No Internet Connection</p>
+    <p>You are currently offline. Please check your internet connection and try again.</p>
+    <div class="divider"></div>
+    <p>तपाईं अहिले अफलाइन हुनुहुन्छ। कृपया आफ्नो इन्टरनेट जडान जाँच गर्नुहोस् र पुन: प्रयास गर्नुहोस्।</p>
+    <button class="retry-button" onclick="window.location.reload()">
+      Retry / पुन: प्रयास गर्नुहोस्
+    </button>
+  </div>
+</body>
+</html>

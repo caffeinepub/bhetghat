@@ -1,0 +1,100 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Fix build/deploy configuration issues by correcting PWA/static assets and service worker caching",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "summary": "Resolve the deployment “System configuration error” by ensuring frontend build inputs and static asset references are valid and deploy-safe.",
+      "acceptanceCriteria": [
+        "A full build+deploy completes without showing “System configuration error”.",
+        "Frontend canister serves the app successfully after deployment (index loads and React mounts).",
+        "Backend canister compiles successfully (Motoko builds without errors)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/sw.js",
+          "operation": "modify",
+          "description": "Remove references to non-deployable source paths (e.g., /src/*.tsx, /src/index.css) from any precache list; ensure install/activate/fetch handlers degrade gracefully when an asset is missing so deployment/build does not fail due to cache population issues."
+        },
+        {
+          "path": "frontend/public/offline.html",
+          "operation": "create",
+          "description": "Add a simple offline fallback HTML page under frontend/public that can be served by the service worker when offline navigation occurs, preventing blank screens in production."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Validate that all PWA/static asset references (manifest + icons) point to files that exist under frontend/public and match the expected runtime paths; adjust any incorrect references to ensure production deploy serves them correctly."
+        }
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "summary": "Ensure all PWA manifest/index icon references exist under frontend/public and are correctly located for runtime serving.",
+      "acceptanceCriteria": [
+        "The following referenced icon paths resolve as static files at runtime (HTTP 200) and are included in the build output: /assets/generated/pwa-icon.dim_192x192.png, /assets/generated/pwa-icon.dim_512x512.png, /assets/generated/pwa-icon-maskable.dim_512x512.png, /assets/generated/favicon.dim_48x48.png, /assets/generated/apple-touch-icon.dim_180x180.png.",
+        "PWA manifest is fetchable at /manifest.webmanifest and contains valid JSON.",
+        "No build-time errors occur due to missing static files referenced by manifest/index.html."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/pwa-icon.dim_192x192.png",
+          "operation": "create",
+          "description": "Add the generated PWA icon asset at this exact path so the manifest reference /assets/generated/pwa-icon.dim_192x192.png resolves at runtime."
+        },
+        {
+          "path": "frontend/public/assets/generated/pwa-icon.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated PWA icon asset at this exact path so the manifest reference /assets/generated/pwa-icon.dim_512x512.png resolves at runtime."
+        },
+        {
+          "path": "frontend/public/assets/generated/pwa-icon-maskable.dim_512x512.png",
+          "operation": "create",
+          "description": "Add the generated maskable PWA icon asset at this exact path so the manifest reference /assets/generated/pwa-icon-maskable.dim_512x512.png resolves at runtime."
+        },
+        {
+          "path": "frontend/public/assets/generated/favicon.dim_48x48.png",
+          "operation": "create",
+          "description": "Add the generated favicon asset at this exact path so the index.html reference /assets/generated/favicon.dim_48x48.png resolves at runtime."
+        },
+        {
+          "path": "frontend/public/assets/generated/apple-touch-icon.dim_180x180.png",
+          "operation": "create",
+          "description": "Add the generated Apple touch icon asset at this exact path so the index.html reference /assets/generated/apple-touch-icon.dim_180x180.png resolves at runtime."
+        },
+        {
+          "path": "frontend/public/manifest.webmanifest",
+          "operation": "modify",
+          "description": "Confirm icon src paths exactly match the static asset locations under frontend/public/assets/generated and that the JSON remains valid and fetchable at /manifest.webmanifest; adjust only if any paths currently mismatch."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Confirm the icon link tags and manifest link reference the correct runtime paths and align with files under frontend/public/assets/generated; adjust only if any paths currently mismatch."
+        }
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "summary": "Harden the service worker to avoid precaching non-public source paths and provide reliable offline navigation fallback without causing build/deploy issues.",
+      "acceptanceCriteria": [
+        "Service worker no longer attempts to pre-cache /src/main.tsx, /src/App.tsx, or other non-public build artifacts.",
+        "Service worker install event completes without unhandled promise rejection, even if some assets cannot be cached.",
+        "App still loads normally online; when offline, navigation requests return a functional offline response/page (no blank screen)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/sw.js",
+          "operation": "modify",
+          "description": "Update CORE_ASSETS to include only deployable public files (e.g., /, /index.html, /manifest.webmanifest, /offline.html, and generated icons). Change install behavior to cache assets individually (or otherwise tolerate missing assets) so install never fails with unhandled promise rejection. Update navigation fetch handling to return a cached offline page (frontend/public/offline.html) when offline, falling back safely if the offline page is not cached."
+        },
+        {
+          "path": "frontend/public/offline.html",
+          "operation": "modify",
+          "description": "Ensure the offline fallback page is self-contained and functional when served directly by the service worker for offline navigation requests (no blank screen)."
+        }
+      ]
+    }
+  ]
+}

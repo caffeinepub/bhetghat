@@ -1,0 +1,84 @@
+{
+  "kind": "build_request",
+  "title": "Resolve deployment 'System configuration error' by validating build inputs and static asset references",
+  "priority": "high",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "text": "Identify and fix the root cause of the deployment/build failure reported as a “System configuration error” by validating the project’s build inputs (frontend static asset references + backend canister compilation) and making any necessary code/config adjustments so the app builds and deploys successfully.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "can you fix the system configuraiton error ? if can please fix"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A full build+deploy completes without showing “System configuration error”.",
+        "Frontend canister serves the app successfully after deployment (index loads and React mounts).",
+        "Backend canister compiles successfully (Motoko builds without errors)."
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "text": "Ensure all files referenced by PWA configuration are present and correctly located under frontend/public (manifest + index.html), specifically all icon files referenced by frontend/public/manifest.webmanifest and frontend/index.html.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "can you fix the system configuraiton error ? if can please fix"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The following referenced icon paths resolve as static files at runtime (HTTP 200) and are included in the build output: /assets/generated/pwa-icon.dim_192x192.png, /assets/generated/pwa-icon.dim_512x512.png, /assets/generated/pwa-icon-maskable.dim_512x512.png, /assets/generated/favicon.dim_48x48.png, /assets/generated/apple-touch-icon.dim_180x180.png.",
+        "PWA manifest is fetchable at /manifest.webmanifest and contains valid JSON.",
+        "No build-time errors occur due to missing static files referenced by manifest/index.html."
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "text": "Harden the service worker cache list in frontend/public/sw.js to avoid caching non-deployable source paths (e.g., /src/*.tsx) and ensure offline fallback behavior does not cause build/deploy issues when assets are missing or paths differ between dev and production builds.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "can you fix the system configuraiton error ? if can please fix"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Service worker no longer attempts to pre-cache /src/main.tsx, /src/App.tsx, or other non-public build artifacts.",
+        "Service worker install event completes without unhandled promise rejection, even if some assets cannot be cached.",
+        "App still loads normally online; when offline, navigation requests return a functional offline response/page (no blank screen)."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor in backend/main.mo; only add backend/migration.mo if state migration is required.",
+    "Do not modify files under frontend/src/components/ui or any paths listed in frontend.immutablePaths (compose instead of editing read-only components).",
+    "Use English for any user-facing text added or changed as part of this fix request."
+  ],
+  "nonGoals": [
+    "Adding payment integrations (Khalti/eSewa) or Supabase integration.",
+    "Implementing new dating app features (matching, chat, onboarding) beyond what is required to resolve the build/deploy error."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

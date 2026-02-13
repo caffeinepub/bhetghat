@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-global-navbar-header-ui-so-a-menu-icon-is-visible-on-desktop-web-and-is-positioned-at-the-top-right-of-the-page-and-clicking-it-opens-the-same-right-side-navigation-sheet-currently-used-on-mobile",
-      "featureTitle": "Update the global Navbar header UI so a menu icon is visible on desktop/web and is positioned at the top-right of the page, and clicking it opens the same right-side navigation sheet currently used on mobile.",
+      "featureId": "feature-change-the-side-menu-sheet-behavior-so-that-when-it-opens-it-renders-a-full-viewport-transparent-overlay-over-the-entire-page-including-the-area-where-the-menu-icon-is-without-darkening-the-page-the-overlay-must-block-interaction-with-underlying-content-and-clicking-tapping-the-overlay-must-close-the-menu",
+      "featureTitle": "Change the side menu (Sheet) behavior so that when it opens it renders a full-viewport transparent overlay over the entire page (including the area where the menu icon is), without darkening the page; the overlay must block interaction with underlying content and clicking/tapping the overlay must close the menu.",
       "files": [
-        "frontend/src/components/AppLayout.tsx"
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/index.css"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -13,10 +14,124 @@
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0"
+        "authorization@4.0.0",
+        "camera@1.0.0"
       ],
       "testIds": [
-        "REQ-40"
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-fix-the-mobile-layout-issue-where-a-section-overlaps-the-home-screen-by-correcting-responsive-spacing-stacking-so-home-content-is-fully-visible-and-not-covered-by-header-footer-navigation-elements-on-common-mobile-breakpoints",
+      "featureTitle": "Fix the mobile layout issue where a section overlaps the Home screen by correcting responsive spacing/stacking so Home content is fully visible and not covered by header/footer/navigation elements on common mobile breakpoints.",
+      "files": [
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "camera@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-make-swipe-cards-functional-end-to-end-discovery-must-provide-a-stable-identifier-principal-for-each-profile-card-and-like-pass-actions-must-call-the-backend-likeprofile-rejectprofile-mutations-for-the-currently-shown-card-and-then-advance-to-the-next-card",
+      "featureTitle": "Make swipe cards functional end-to-end: discovery must provide a stable identifier (Principal) for each profile card, and Like/Pass actions must call the backend likeProfile/rejectProfile mutations for the currently shown card and then advance to the next card.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "camera@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-a-real-matching-screen-flow-when-a-like-results-in-a-mutual-match-show-a-dedicated-it-s-a-match-screen-modal-with-both-users-basic-info-and-a-primary-action-to-start-chat-plus-a-secondary-action-to-keep-swiping",
+      "featureTitle": "Implement a real matching screen/flow: when a Like results in a mutual match, show a dedicated ‘It’s a match’ screen/modal with both users’ basic info and a primary action to start chat, plus a secondary action to keep swiping.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/components/ItsAMatchModal.tsx",
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "camera@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-make-the-matches-page-list-real-matches-by-adding-using-backend-support-to-fetch-the-caller-s-matched-users-including-their-principals-and-render-them-in-the-existing-matches-page-selecting-a-match-must-open-chat-with-the-correct-match-principal",
+      "featureTitle": "Make the Matches page list real matches by adding/using backend support to fetch the caller’s matched users (including their principals) and render them in the existing Matches page; selecting a match must open Chat with the correct match principal.",
+      "files": [
+        "frontend/src/App.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/Chat.tsx",
+        "frontend/src/pages/Matches.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "camera@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-cohesive-tinder-like-ui-style-2-refresh-across-home-cards-matches-list-items-and-chat-message-bubbles-header-while-keeping-user-facing-copy-in-english-update-colors-spacing-typography-and-animations-consistently-without-switching-the-app-to-dark-mode",
+      "featureTitle": "Apply a cohesive Tinder-like ‘UI style 2’ refresh across Home (cards), Matches (list items), and Chat (message bubbles/header) while keeping user-facing copy in English; update colors, spacing, typography, and animations consistently without switching the app to dark mode.",
+      "files": [
+        "frontend/src/index.css",
+        "frontend/src/pages/Chat.tsx",
+        "frontend/src/pages/Home.tsx",
+        "frontend/src/pages/Matches.tsx",
+        "frontend/tailwind.config.js"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "authorization@4.0.0",
+        "camera@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
       ],
       "confidence": "high"
     }

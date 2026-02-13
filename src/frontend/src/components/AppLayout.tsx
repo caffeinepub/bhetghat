@@ -92,8 +92,17 @@ export function AppLayout({ children, currentPage = 'home', onNavigate }: AppLay
         </div>
       </header>
 
+      {/* Transparent overlay when menu is open */}
+      {sheetOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-transparent backdrop-blur-[2px]"
+          onClick={() => setSheetOpen(false)}
+          style={{ pointerEvents: 'auto' }}
+        />
+      )}
+
       {/* Main Content */}
-      <main className="flex-1">
+      <main className="flex-1 pb-safe">
         {children}
       </main>
 

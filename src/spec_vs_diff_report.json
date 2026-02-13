@@ -1,25 +1,104 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T16:35:56.212Z",
-  "summary": "REQ-40 appears implemented by adding a always-visible Menu (hamburger) button in the header that triggers the existing right-side Sheet navigation. REQ-39 is not evidenced in the provided diff summary (no actor creation/useActor changes shown), so the createActor warning fix appears missing from this change set.",
+  "generatedAt": "2026-02-13T02:30:27.380Z",
+  "summary": "REQ-1 (transparent, full-viewport menu overlay) appears implemented via a fixed transparent backdrop in AppLayout. However, core swipe/match flow requirements (REQ-3/4) are not implemented end-to-end: discovery still lacks real Principals and Home Like/Pass does not call backend mutations. Backend and Matches support is partially present (getMatches query exists), but some requirements cannot be fully verified from the truncated diff. Additionally, unrequested Nepali/i18n language support was added, conflicting with the “English-only copy” requirement.",
   "missing_requirements": [
     {
-      "id": "REQ-39",
-      "requirement": "Remove the production console warning by ensuring the frontend actor creation path passes only one of `agent` or `agentOptions` to `createActor` (including authenticated identity case in `frontend/src/hooks/useActor.ts`).",
-      "reason": "The diff summary shows modifications only to `frontend/src/components/AppLayout.tsx` and metadata/summary files; there is no evidence of changes to the actor creation path or `frontend/src/hooks/useActor.ts` to prevent passing both `agent` and `agentOptions`.",
+      "id": "REQ-2",
+      "requirement": "Fix the mobile layout issue where a section overlaps the Home screen so Home content is fully visible and not covered by header/footer/navigation on common mobile breakpoints.",
+      "reason": "The diff shows addition of a `.pb-safe` utility and `main` uses `pb-safe`, but there is no clear evidence of specific responsive spacing/stacking changes addressing the described overlap on Home (e.g., adjustments to header/footer positioning or Home page spacing). With only the provided snippets, the overlap fix cannot be confirmed.",
       "evidence": [
         "frontend/src/components/AppLayout.tsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/Home.tsx"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Make swipe cards functional end-to-end: discovery provides a stable identifier (Principal) per card; Like/Pass call backend likeProfile/rejectProfile for the current card and advance; discovery excludes caller; errors show user-visible message.",
+      "reason": "Discovery still does not provide real Principals: `useGetDiscoverProfiles` returns a placeholder `Principal.fromText('aaaaa-aa')` and includes comments stating it’s a workaround. Home explicitly does not call `likeProfile`/`rejectProfile` and instead advances via `setTimeout`, with TODOs to wire backend later.",
+      "evidence": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/Home.tsx"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "When a Like results in a mutual match, show an immediate ‘It’s a match’ screen/modal with actions to start chat or keep swiping, and after dismiss return to next card (not reset).",
+      "reason": "An `ItsAMatchModal` component and App-level state exist, but the Like action in Home never calls `likeProfile` and therefore cannot detect a mutual match to trigger the modal. The match flow is not wired to backend results.",
+      "evidence": [
+        "frontend/src/components/ItsAMatchModal.tsx",
+        "frontend/src/App.tsx",
+        "frontend/src/pages/Home.tsx"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "Matches page lists real matches using backend support (including principals) and selecting a match opens Chat with the correct principal; no placeholder matches fetching remains.",
+      "reason": "Backend adds `getMatches() : async [Principal]`, and the Matches page expects items with both `profile` and `principal`. However, the provided diff snippets do not show the implementation of `useGetMatches` that maps match principals to profiles (and removes any placeholder behavior). Without that evidence, the end-to-end Matches→Chat correctness cannot be verified.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/pages/Matches.tsx",
+        "frontend/src/hooks/useQueries.ts (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "requirement": "Fix backend match/chat identity correctness with deterministic, collision-resistant match/chat ID derived from both principals (order-independent) and use it consistently in match/chat/signaling stores.",
+      "reason": "The backend data structures were changed to use `ChatId` as the key for match/chat/signaling stores, but the diff does not show a deterministic normalization function (e.g., sorting principals) being applied consistently when creating/looking up IDs inside like/unmatch/message/signaling methods (those sections are truncated). Thus, order-independence and correct unmatch/messaging/signaling behavior cannot be confirmed from the provided evidence.",
+      "evidence": [
+        "backend/main.mo (truncated)",
+        "backend/migration.mo"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Apply cohesive Tinder-like ‘UI style 2’ refresh across Home/Matches/Chat while keeping user-facing copy in English and not switching to dark mode.",
+      "reason": "Styling updates are present (theme colors/radii, updated Matches cards, match modal), but the diff adds Nepali-language UI capability and translations, which conflicts with the requirement that no non-English user-facing text be introduced.",
+      "evidence": [
+        "frontend/src/i18n/translations.ts",
         "frontend-file-summaries.txt",
-        "project_state.json"
+        "frontend/src/components/LanguageToggle.tsx (mentioned in summaries)"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.72,
+  "hallucinated_features": [
+    {
+      "description": "Added bilingual (English/Nepali) internationalization features including LanguageToggle UI and Nepali translations.",
+      "reason": "BuildRequest requires keeping user-facing copy in English and explicitly says no user-facing text should be introduced in a non-English language. Adding Nepali translations/toggle was not requested and conflicts with REQ-7 AC.",
+      "evidence": [
+        "frontend/src/i18n/translations.ts",
+        "frontend/src/components/AppLayout.tsx",
+        "frontend-file-summaries.txt"
+      ]
+    },
+    {
+      "description": "WebRTC video calling STUN server configuration and expanded video call UI/flow changes.",
+      "reason": "The BuildRequest focuses on swipe, matching, chat, and UI/layout fixes; it explicitly lists real-time chat via websockets/push as non-goals but does not request expanding video calling features. The diff includes substantial video-call related logic and STUN servers.",
+      "evidence": [
+        "frontend/src/hooks/useVideoCall.ts",
+        "frontend/src/pages/Chat.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.74,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
+    "frontend/src/App.tsx",
     "frontend/src/components/AppLayout.tsx",
+    "frontend/src/components/ItsAMatchModal.tsx",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/hooks/useVideoCall.ts",
+    "frontend/src/i18n/translations.ts",
+    "frontend/src/index.css",
+    "frontend/src/pages/Chat.tsx",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/Matches.tsx",
+    "frontend/src/utils/chatId.ts",
+    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

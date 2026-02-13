@@ -10,6 +10,7 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
+export interface ChatId { 'user1' : Principal, 'user2' : Principal }
 export interface DatingPreferences {
   'preferredGenders' : Array<Gender>,
   'minAge' : number,
@@ -28,6 +29,7 @@ export interface DatingProfile {
   'isVisible' : boolean,
   'personalityTraits' : Array<string>,
   'datingPreferences' : DatingPreferences,
+  'phoneNumber' : [] | [string],
   'socialMedia' : Array<string>,
   'lastName' : string,
   'location' : string,
@@ -44,6 +46,18 @@ export interface Message {
   'sender' : Principal,
   'timestamp' : bigint,
 }
+export interface SignalingMessage {
+  'signalingData' : string,
+  'sender' : Principal,
+  'timestamp' : bigint,
+}
+export type SignalingResult = { 'Unmatched' : null } |
+  { 'NotMatched' : null } |
+  { 'TryAgain' : null } |
+  { 'Success' : string } |
+  { 'BufferFull' : null } |
+  { 'InvalidData' : null } |
+  { 'InvalidOperation' : null };
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -54,10 +68,15 @@ export interface _SERVICE {
   'deleteProfile' : ActorMethod<[], undefined>,
   'getCallerUserProfile' : ActorMethod<[], [] | [DatingProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getMatches' : ActorMethod<[], Array<Principal>>,
   'getMessages' : ActorMethod<[Principal], Array<Message>>,
   'getOwnProfile' : ActorMethod<[], [] | [DatingProfile]>,
   'getProfiles' : ActorMethod<[], Array<DatingProfile>>,
   'getPublicProfile' : ActorMethod<[Principal], [] | [DatingProfile]>,
+  'getUnreadSignalingMessages' : ActorMethod<
+    [ChatId, bigint],
+    Array<SignalingMessage>
+  >,
   'getUserProfile' : ActorMethod<[Principal], [] | [DatingProfile]>,
   'hideProfile' : ActorMethod<[], boolean>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
@@ -65,6 +84,7 @@ export interface _SERVICE {
   'rejectProfile' : ActorMethod<[Principal], boolean>,
   'saveCallerUserProfile' : ActorMethod<[DatingProfile], undefined>,
   'sendMessage' : ActorMethod<[Principal, string], boolean>,
+  'sendVideoCallSignaling' : ActorMethod<[Principal, string], SignalingResult>,
   'unmatchProfile' : ActorMethod<[Principal], boolean>,
   'updateProfile' : ActorMethod<[DatingProfile], undefined>,
 }

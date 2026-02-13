@@ -1,5 +1,4 @@
 import Map "mo:core/Map";
-import Nat "mo:core/Nat";
 import Array "mo:core/Array";
 import Principal "mo:core/Principal";
 import Order "mo:core/Order";
@@ -7,11 +6,18 @@ import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+import Migration "migration";
 
-// Apply data migration
-
+(with migration = Migration.run)
 actor {
-  // ENUMS AND TYPES
+  module Matches {
+    public func compare(a : ChatId, b : ChatId) : Order.Order {
+      switch (Principal.compare(a.user1, b.user1)) {
+        case (#equal) { Principal.compare(a.user2, b.user2) };
+        case (comparison) { comparison };
+      };
+    };
+  };
 
   type Gender = {
     #male;
@@ -44,6 +50,7 @@ actor {
     links : [Text];
     languages : [Text];
     isVisible : Bool;
+    phoneNumber : ?Text;
     hasVideoChatEnabled : Bool;
   };
 
@@ -59,15 +66,51 @@ actor {
     timestamp : Int;
   };
 
+  type SignalingMessage = {
+    sender : Principal;
+    signalingData : Text;
+    timestamp : Int;
+  };
+
+  type ChatId = {
+    user1 : Principal;
+    user2 : Principal;
+  };
+
+  type SignalingResult = {
+    #Success : Text;
+    #NotMatched;
+    #Unmatched;
+    #InvalidData;
+    #TryAgain;
+    #InvalidOperation;
+    #BufferFull;
+  };
+
   let profileStore = Map.empty<Principal, DatingProfile>();
-  let matchStore = Map.empty<Nat, Match>();
-  let chatStore = Map.empty<Nat, [Message]>();
+  let matchStore = Map.empty<ChatId, Match>();
+  let chatStore = Map.empty<ChatId, [Message]>();
   let likes = Map.empty<Principal, [Principal]>();
   let rejections = Map.empty<Principal, [Principal]>();
+  let signalingStore = Map.empty<ChatId, [SignalingMessage]>();
 
   // Authentication
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+
+  // MATCH LOGIC
+
+  public query ({ caller }) func getMatches() : async [Principal] {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view matches");
+    };
+    let matches = matchStore.toArray().map(
+      func((chatId, _)) {
+        if (chatId.user1 == caller) { chatId.user2 } else { chatId.user1 };
+      }
+    );
+    matches;
+  };
 
   // PROFILE MANAGEMENT
 
@@ -111,8 +154,10 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view profiles");
     };
-    // Filter out hidden profiles
-    profileStore.values().toArray().filter(func(p) { p.isVisible });
+    // Filter out hidden profiles and remove phone numbers for privacy
+    profileStore.values().toArray().filter(func(p) { p.isVisible }).map(func(p) {
+      { p with phoneNumber = null }
+    });
   };
 
   public query ({ caller }) func getPublicProfile(
@@ -125,7 +170,13 @@ actor {
       case (null) { null };
       case (?profile) {
         if (not profile.isVisible) { Runtime.trap("Profile is not publicly visible!") };
-        ?profile;
+        // Only show phone number if users are matched
+        let showPhone = areTheyMatched(caller, principal);
+        if (showPhone) {
+          ?profile;
+        } else {
+          ?{ profile with phoneNumber = null };
+        };
       };
     };
   };
@@ -134,14 +185,30 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view profiles");
     };
+    // Users can see their own full profile including phone number
     profileStore.get(caller);
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?DatingProfile {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own profile");
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can view profiles");
     };
-    profileStore.get(user);
+
+    // Users can view their own full profile
+    if (caller == user) {
+      return profileStore.get(user);
+    };
+
+    // Admins can view any profile but without phone number (privacy protection)
+    if (AccessControl.isAdmin(accessControlState, caller)) {
+      return switch (profileStore.get(user)) {
+        case (null) { null };
+        case (?profile) { ?{ profile with phoneNumber = null } };
+      };
+    };
+
+    // Non-admin users cannot view other users' profiles through this endpoint
+    Runtime.trap("Unauthorized: Can only view your own profile");
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : DatingProfile) : async () {
@@ -155,6 +222,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can see profiles");
     };
+    // Users can see their own full profile including phone number
     profileStore.get(caller);
   };
 
@@ -173,18 +241,9 @@ actor {
     };
   };
 
-  // MATCH LOGIC
-
-  func compareMatches(a : (Principal, Principal, Int), b : (Principal, Principal, Int)) : Order.Order {
-    Principal.compare(a.0, b.0);
-  };
-
-  func getMatchId(a : Principal, b : Principal) : Nat {
-    let comparison = compareMatches((a, b, 0), (b, a, 0));
-    switch (comparison) {
-      case (#less) { 0 };
-      case (#greater) { 0 };
-      case (_) { 0 };
+  func normalizeChatId(a : Principal, b : Principal) : ChatId {
+    if (a.toText() < b.toText()) { { user1 = a; user2 = b } } else {
+      { user1 = b; user2 = a };
     };
   };
 
@@ -192,15 +251,6 @@ actor {
     switch (likes.get(from)) {
       case (?likedList) {
         likedList.filter(func(p) { p == to }).size() > 0;
-      };
-      case (null) { false };
-    };
-  };
-
-  func isDuplicateRejection(from : Principal, to : Principal) : Bool {
-    switch (rejections.get(from)) {
-      case (?rejectedList) {
-        rejectedList.filter(func(p) { p == to }).size() > 0;
       };
       case (null) { false };
     };
@@ -216,6 +266,11 @@ actor {
       case (null) { false };
     };
     aLikesB and bLikesA;
+  };
+
+  func areTheyMatched(user1 : Principal, user2 : Principal) : Bool {
+    let normalizedId = normalizeChatId(user1, user2);
+    matchStore.containsKey(normalizedId);
   };
 
   public shared ({ caller }) func likeProfile(liked : Principal) : async Bool {
@@ -253,13 +308,13 @@ actor {
 
     if (hasMutualMatch(caller, liked)) {
       // Store new match
-      let matchId = getMatchId(caller, liked);
+      let normalizedId = normalizeChatId(caller, liked);
       let match = {
         user1 = caller;
         user2 = liked;
         timestamp = 0;
       };
-      matchStore.add(matchId, match);
+      matchStore.add(normalizedId, match);
       // Return true if match successful
       true;
     } else { false };
@@ -270,23 +325,22 @@ actor {
       Runtime.trap("Unauthorized: Only users can reject profiles");
     };
 
-    if (isDuplicateRejection(caller, rejected)) {
-      Runtime.trap("You have already rejected this profile!");
-    };
-
-    if (rejections.containsKey(caller)) {
-      let rejection = rejections.get(caller);
-      switch (rejection) {
-        case (?currentRejections) {
-          rejections.add(caller, currentRejections.concat([rejected]));
-          return true;
+    switch (rejections.get(caller)) {
+      case (?rejectedList) {
+        if (rejectedList.filter(func(p) { p == rejected }).size() > 0) {
+          // Profile is already in the rejected set
+          Runtime.trap("You have already rejected this profile!");
+        } else {
+          // Add the new rejection to the set
+          rejections.add(caller, rejectedList.concat([rejected]));
+          true;
         };
-        case (null) {};
       };
-      return false;
-    } else {
-      rejections.add(caller, [rejected]);
-      return true;
+      case (null) {
+        // Rejections map is empty, create new array with rejected profile
+        rejections.add(caller, [rejected]);
+        true;
+      };
     };
   };
 
@@ -295,14 +349,106 @@ actor {
       Runtime.trap("Unauthorized: Only users can unmatch profiles");
     };
 
+    // Verify the caller is actually matched with this profile
+    if (not areTheyMatched(caller, profile)) {
+      Runtime.trap("Unauthorized: Can only unmatch profiles you are matched with");
+    };
+
     // Remove any match
-    let matchId = getMatchId(caller, profile);
-    matchStore.remove(matchId);
+    let normalizedId = normalizeChatId(caller, profile);
+    matchStore.remove(normalizedId);
     true;
   };
 
-  func areTheyMatched(user1 : Principal, user2 : Principal) : Bool {
-    matchStore.containsKey(getMatchId(user1, user2));
+  // SIGNALING RELAY FEATURE (Only call if there is a match! No data gets stored)
+
+  public shared ({ caller }) func sendVideoCallSignaling(
+    recipient : Principal,
+    signalingData : Text,
+  ) : async SignalingResult {
+    // Required authorization
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can send signaling data");
+    };
+
+    // Prevent self signaled-data
+    if (recipient == caller) {
+      return #InvalidOperation;
+    };
+
+    // Check recipient has video calling enabled
+    let recipientProfile = switch (profileStore.get(recipient)) {
+      case (null) { return #NotMatched };
+      case (?profile) {
+        if (not profile.hasVideoChatEnabled) {
+          return #NotMatched;
+        } else {
+          profile;
+        };
+      };
+    };
+
+    // Only allow signaling if matched
+    if (not areTheyMatched(caller, recipient)) {
+      return #Unmatched;
+    };
+
+    // Validate signaling data
+    if (signalingData.size() == 0) {
+      return #InvalidData;
+    };
+
+    // Create signaling message
+    let message = {
+      sender = caller;
+      signalingData;
+      timestamp = 0;
+    };
+
+    // Update signaling store
+    let chatId = normalizeChatId(caller, recipient);
+    let newMessages = switch (signalingStore.get(chatId)) {
+      case (?existingMessages) {
+        if (existingMessages.size() >= 10) {
+          return #BufferFull;
+        };
+        [message].concat(existingMessages);
+      };
+      case (null) { [message] };
+    };
+    signalingStore.add(chatId, newMessages);
+
+    // Return success
+    #Success("Video call signaling sent successfully");
+  };
+
+  public query ({ caller }) func getUnreadSignalingMessages(
+    chatId : ChatId,
+    lastTimestamp : Int,
+  ) : async [SignalingMessage] {
+    // Authorization check: Only users can retrieve signaling messages
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can retrieve signaling messages");
+    };
+
+    // Verify caller is part of the chat (match verification)
+    switch (matchStore.get(chatId)) {
+      case (?match) {
+        if (match.user1 != caller and match.user2 != caller) {
+          Runtime.trap("Unauthorized: Can only retrieve signaling messages from your own matches");
+        };
+      };
+      case (null) {
+        Runtime.trap("Unauthorized: Invalid chat ID or no match found");
+      };
+    };
+
+    switch (signalingStore.get(chatId)) {
+      case (?messages) {
+        messages.filter(func(m) { m.timestamp > lastTimestamp });
+      };
+      case (null) { [] };
+    };
   };
 
   // MESSAGING
@@ -315,9 +461,7 @@ actor {
       Runtime.trap("Unauthorized: Only users can send messages");
     };
 
-    if (recipient == caller) {
-      Runtime.trap("Cannot send message to yourself!");
-    };
+    if (recipient == caller) { Runtime.trap("Cannot send message to yourself!") };
 
     if (not areTheyMatched(caller, recipient)) {
       Runtime.trap("Cannot send message: Only matched users can send messages!");
@@ -329,7 +473,7 @@ actor {
       timestamp = 0;
     };
 
-    let chatId = getMatchId(caller, recipient);
+    let chatId = normalizeChatId(caller, recipient);
 
     switch (chatStore.get(chatId)) {
       case (?existingMessages) {
@@ -342,7 +486,7 @@ actor {
     true;
   };
 
-  public shared ({ caller }) func getMessages(entity : Principal) : async [Message] {
+  public query ({ caller }) func getMessages(entity : Principal) : async [Message] {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only users can view messages");
     };
@@ -351,7 +495,7 @@ actor {
       Runtime.trap("Can only see messages with users you are matched with!");
     };
 
-    switch (chatStore.get(getMatchId(caller, entity))) {
+    switch (chatStore.get(normalizeChatId(caller, entity))) {
       case (?msgs) { msgs };
       case (null) { [] };
     };

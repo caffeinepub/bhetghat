@@ -1,14 +1,20 @@
 import { useI18n } from '../i18n/I18nProvider';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { useGetCallerProfile } from '../hooks/useQueries';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { LanguageToggle } from '../components/LanguageToggle';
-import { Settings as SettingsIcon, LogOut, Globe, Info } from 'lucide-react';
+import { Settings as SettingsIcon, LogOut, Globe, Info, Phone, Edit } from 'lucide-react';
 import { Separator } from '../components/ui/separator';
 
-export function Settings() {
+interface SettingsProps {
+  onNavigateToProfile?: () => void;
+}
+
+export function Settings({ onNavigateToProfile }: SettingsProps) {
   const { t, language } = useI18n();
   const { identity, clear } = useInternetIdentity();
+  const { data: profile } = useGetCallerProfile();
 
   const handleLogout = async () => {
     await clear();
@@ -39,6 +45,32 @@ export function Settings() {
                 </p>
               </div>
               <LanguageToggle />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Phone className="h-5 w-5" />
+              {t('phoneNumber')}
+            </CardTitle>
+            <CardDescription>{t('phoneNumberSettingsDescription')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">{t('phoneNumber')}</p>
+                <p className="text-sm text-muted-foreground">
+                  {profile?.phoneNumber || t('phoneNumberNotSet')}
+                </p>
+              </div>
+              {onNavigateToProfile && (
+                <Button variant="outline" size="sm" onClick={onNavigateToProfile}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  {t('change')}
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>

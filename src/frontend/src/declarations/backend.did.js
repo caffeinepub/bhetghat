@@ -36,6 +36,7 @@ export const DatingProfile = IDL.Record({
   'isVisible' : IDL.Bool,
   'personalityTraits' : IDL.Vec(IDL.Text),
   'datingPreferences' : DatingPreferences,
+  'phoneNumber' : IDL.Opt(IDL.Text),
   'socialMedia' : IDL.Vec(IDL.Text),
   'lastName' : IDL.Text,
   'location' : IDL.Text,
@@ -49,6 +50,24 @@ export const Message = IDL.Record({
   'sender' : IDL.Principal,
   'timestamp' : IDL.Int,
 });
+export const ChatId = IDL.Record({
+  'user1' : IDL.Principal,
+  'user2' : IDL.Principal,
+});
+export const SignalingMessage = IDL.Record({
+  'signalingData' : IDL.Text,
+  'sender' : IDL.Principal,
+  'timestamp' : IDL.Int,
+});
+export const SignalingResult = IDL.Variant({
+  'Unmatched' : IDL.Null,
+  'NotMatched' : IDL.Null,
+  'TryAgain' : IDL.Null,
+  'Success' : IDL.Text,
+  'BufferFull' : IDL.Null,
+  'InvalidData' : IDL.Null,
+  'InvalidOperation' : IDL.Null,
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -57,12 +76,18 @@ export const idlService = IDL.Service({
   'deleteProfile' : IDL.Func([], [], []),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-  'getMessages' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], []),
+  'getMatches' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+  'getMessages' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], ['query']),
   'getOwnProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
   'getProfiles' : IDL.Func([], [IDL.Vec(DatingProfile)], ['query']),
   'getPublicProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(DatingProfile)],
+      ['query'],
+    ),
+  'getUnreadSignalingMessages' : IDL.Func(
+      [ChatId, IDL.Int],
+      [IDL.Vec(SignalingMessage)],
       ['query'],
     ),
   'getUserProfile' : IDL.Func(
@@ -76,6 +101,11 @@ export const idlService = IDL.Service({
   'rejectProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
   'saveCallerUserProfile' : IDL.Func([DatingProfile], [], []),
   'sendMessage' : IDL.Func([IDL.Principal, IDL.Text], [IDL.Bool], []),
+  'sendVideoCallSignaling' : IDL.Func(
+      [IDL.Principal, IDL.Text],
+      [SignalingResult],
+      [],
+    ),
   'unmatchProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
   'updateProfile' : IDL.Func([DatingProfile], [], []),
 });
@@ -111,6 +141,7 @@ export const idlFactory = ({ IDL }) => {
     'isVisible' : IDL.Bool,
     'personalityTraits' : IDL.Vec(IDL.Text),
     'datingPreferences' : DatingPreferences,
+    'phoneNumber' : IDL.Opt(IDL.Text),
     'socialMedia' : IDL.Vec(IDL.Text),
     'lastName' : IDL.Text,
     'location' : IDL.Text,
@@ -124,6 +155,24 @@ export const idlFactory = ({ IDL }) => {
     'sender' : IDL.Principal,
     'timestamp' : IDL.Int,
   });
+  const ChatId = IDL.Record({
+    'user1' : IDL.Principal,
+    'user2' : IDL.Principal,
+  });
+  const SignalingMessage = IDL.Record({
+    'signalingData' : IDL.Text,
+    'sender' : IDL.Principal,
+    'timestamp' : IDL.Int,
+  });
+  const SignalingResult = IDL.Variant({
+    'Unmatched' : IDL.Null,
+    'NotMatched' : IDL.Null,
+    'TryAgain' : IDL.Null,
+    'Success' : IDL.Text,
+    'BufferFull' : IDL.Null,
+    'InvalidData' : IDL.Null,
+    'InvalidOperation' : IDL.Null,
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
@@ -132,12 +181,18 @@ export const idlFactory = ({ IDL }) => {
     'deleteProfile' : IDL.Func([], [], []),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getMessages' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], []),
+    'getMatches' : IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
+    'getMessages' : IDL.Func([IDL.Principal], [IDL.Vec(Message)], ['query']),
     'getOwnProfile' : IDL.Func([], [IDL.Opt(DatingProfile)], ['query']),
     'getProfiles' : IDL.Func([], [IDL.Vec(DatingProfile)], ['query']),
     'getPublicProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(DatingProfile)],
+        ['query'],
+      ),
+    'getUnreadSignalingMessages' : IDL.Func(
+        [ChatId, IDL.Int],
+        [IDL.Vec(SignalingMessage)],
         ['query'],
       ),
     'getUserProfile' : IDL.Func(
@@ -151,6 +206,11 @@ export const idlFactory = ({ IDL }) => {
     'rejectProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
     'saveCallerUserProfile' : IDL.Func([DatingProfile], [], []),
     'sendMessage' : IDL.Func([IDL.Principal, IDL.Text], [IDL.Bool], []),
+    'sendVideoCallSignaling' : IDL.Func(
+        [IDL.Principal, IDL.Text],
+        [SignalingResult],
+        [],
+      ),
     'unmatchProfile' : IDL.Func([IDL.Principal], [IDL.Bool], []),
     'updateProfile' : IDL.Func([DatingProfile], [], []),
   });

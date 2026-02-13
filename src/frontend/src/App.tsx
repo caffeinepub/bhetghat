@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useGetCallerProfile } from './hooks/useQueries';
@@ -11,7 +11,8 @@ import { Matches } from './pages/Matches';
 import { Chat } from './pages/Chat';
 import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
-import { useState } from 'react';
+import { PhoneNumberPromptModal } from './components/PhoneNumberPromptModal';
+import { ItsAMatchModal } from './components/ItsAMatchModal';
 import type { DatingProfile } from './backend';
 import { Principal } from '@dfinity/principal';
 import { FatalErrorBoundary } from './components/FatalErrorBoundary';
@@ -26,6 +27,8 @@ function AppContent() {
   const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerProfile();
   const [currentPage, setCurrentPage] = useState<PageType>('home');
   const [selectedMatch, setSelectedMatch] = useState<{ profile: DatingProfile; principal: Principal | null } | null>(null);
+  const [phonePromptDismissed, setPhonePromptDismissed] = useState(false);
+  const [matchModal, setMatchModal] = useState<{ profile: DatingProfile; principal: Principal } | null>(null);
 
   const isAuthenticated = !!identity;
 
@@ -33,6 +36,14 @@ function AppContent() {
   useEffect(() => {
     window.dispatchEvent(new Event('app-mounted'));
     console.log('[App] React app mounted successfully');
+  }, []);
+
+  // Check sessionStorage for dismissed state on mount
+  useEffect(() => {
+    const dismissed = sessionStorage.getItem('phonePromptDismissed');
+    if (dismissed === 'true') {
+      setPhonePromptDismissed(true);
+    }
   }, []);
 
   if (!isOnline) {
@@ -46,14 +57,35 @@ function AppContent() {
     }
   };
 
-  const handleSelectMatch = (profile: DatingProfile) => {
-    setSelectedMatch({ profile, principal: null });
+  const handleNavigateToProfile = () => {
+    setCurrentPage('profile');
+  };
+
+  const handleMatch = (matchedProfile: DatingProfile, matchedPrincipal: Principal) => {
+    setMatchModal({ profile: matchedProfile, principal: matchedPrincipal });
+  };
+
+  const handleStartChatFromMatch = () => {
+    if (matchModal) {
+      setSelectedMatch({ profile: matchModal.profile, principal: matchModal.principal });
+      setCurrentPage('chat');
+      setMatchModal(null);
+    }
+  };
+
+  const handleSelectMatch = (profile: DatingProfile, principal: Principal) => {
+    setSelectedMatch({ profile, principal });
     setCurrentPage('chat');
   };
 
   const handleBackFromChat = () => {
     setSelectedMatch(null);
     setCurrentPage('matches');
+  };
+
+  const handleClosePhonePrompt = () => {
+    setPhonePromptDismissed(true);
+    sessionStorage.setItem('phonePromptDismissed', 'true');
   };
 
   // Show install page regardless of auth
@@ -78,6 +110,15 @@ function AppContent() {
   const hasProfile = userProfile !== null;
   const showProfileSetup = isAuthenticated && !profileLoading && isFetched && !hasProfile;
 
+  // Show phone number prompt if authenticated, has profile, no phone number, and not dismissed
+  const showPhonePrompt = 
+    isAuthenticated && 
+    !profileLoading && 
+    isFetched && 
+    hasProfile && 
+    !userProfile?.phoneNumber && 
+    !phonePromptDismissed;
+
   // Always allow access to Profile and Settings
   if (currentPage === 'profile') {
     return (
@@ -90,7 +131,10 @@ function AppContent() {
   if (currentPage === 'settings') {
     return (
       <AppLayout currentPage={currentPage} onNavigate={handleNavigate}>
-        <Settings />
+        <Settings onNavigateToProfile={handleNavigateToProfile} />
+        {showPhonePrompt && (
+          <PhoneNumberPromptModal open={showPhonePrompt} onClose={handleClosePhonePrompt} />
+        )}
       </AppLayout>
     );
   }
@@ -115,13 +159,25 @@ function AppContent() {
     );
   }
 
-  // Render authenticated pages
+  // Render authenticated pages with phone prompt overlay
   return (
     <AppLayout currentPage={currentPage} onNavigate={handleNavigate}>
-      {currentPage === 'home' && <Home />}
+      {currentPage === 'home' && <Home onMatch={handleMatch} />}
       {currentPage === 'matches' && <Matches onSelectMatch={handleSelectMatch} />}
       {currentPage === 'chat' && selectedMatch && (
         <Chat match={selectedMatch.profile} matchPrincipal={selectedMatch.principal} onBack={handleBackFromChat} />
+      )}
+      {showPhonePrompt && (
+        <PhoneNumberPromptModal open={showPhonePrompt} onClose={handleClosePhonePrompt} />
+      )}
+      {matchModal && (
+        <ItsAMatchModal
+          open={!!matchModal}
+          onClose={() => setMatchModal(null)}
+          matchedProfile={matchModal.profile}
+          currentUserProfile={userProfile ?? null}
+          onStartChat={handleStartChatFromMatch}
+        />
       )}
     </AppLayout>
   );

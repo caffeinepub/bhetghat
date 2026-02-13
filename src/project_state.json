@@ -1,302 +1,56 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 25,
-  "summary": "Building “Bhetghat”, a free bilingual (English+Nepali) Nepali dating web app similar to Tinder, with swipe matching, detailed profiles, chat after matching, advertisement space, and optimized as an installable PWA (Add to Home Screen) since App Store/Play Store distribution and Nepali wallet payments aren’t supported.",
-  "architectural_notes": [
-    "Payments disabled: no eSewa/Khalti/Nepali banking wallets; build as free app without requiring credit card/Stripe.",
-    "Target is a mobile-friendly web app (not native Android/iOS). Provide installable experience via PWA/Add to Home Screen (not App Store/Play Store).",
-    "Platform constraint: cannot use Supabase/Node-style server routes; backend must run on Internet Computer (Motoko), so Khalti/eSewa integrations are not supported here.",
-    "Blank white screen root cause identified: production is attempting to load frontend entry at /src/main.tsx (dev-only path) instead of the built asset bundle under /assets; app entry point/index.html needs correction for production builds.",
-    "Startup/blank-page mitigation decision: temporarily disable/unregister the PWA service worker to bypass potentially stale cached index.html/assets until the production entry-point issue is fully resolved.",
-    "Console shows manifest icon load/validity problem: /assets/generated/pwa-icon.dim_192x192.png is failing to download or is not a valid image; PWA icon assets under frontend/public/assets/generated need to be valid PNGs and correctly served in production.",
-    "Browser console warning: <meta name=\"apple-mobile-web-app-capable\"> is deprecated; add/ensure <meta name=\"mobile-web-app-capable\" content=\"yes\"> for modern compatibility (non-blocking).",
-    "Runtime crash identified: `useI18n must be used within I18nProvider` coming from AppLayout; app root must wrap AppLayout in I18nProvider (and ensure i18n initialization occurs before any component calls useI18n).",
-    "Production console error observed: `[Boot Watchdog] App failed to mount within 10 seconds`, indicating the React app bundle is still not mounting in production (blank screen persists; error appears after a few seconds).",
-    "Production console warning to address: createActor is being called with both `agent` and `agentOptions`; standardize actor creation to pass only one to avoid warnings and potential misconfiguration."
-  ],
-  "known_issues": [
-    "Deployment/build failing with a 'System configuration error' (platform-level build issue).",
-    "Live deployment (Version 3) shows a blank page when loading the app URL (app not rendering).",
-    "After deploying Version 5, the live app still renders a blank page (no UI visible) at the production URL with #caffeineAdminToken hash.",
-    "Root cause identified for blank page: production is trying to load /src/main.tsx (not present in production), preventing React from mounting; fix requires updating the app entry point/index.html to reference built assets.",
-    "Likely contributor to persistent blank page: service worker caching/serving stale index.html or asset paths; plan is to temporarily disable the service worker to force fresh loads.",
-    "Production console reports manifest icon error: https://bhetghat-fus.caffeine.xyz/assets/generated/pwa-icon.dim_192x192.png is not a valid image or failed to download (may affect PWA installability and could contribute to startup issues).",
-    "Live app shows loading error due to runtime exception: `useI18n must be used within I18nProvider` (AppLayout calling useI18n without provider), preventing UI from rendering.",
-    "Production console reports `entry-loader.js:82 [Boot Watchdog] App failed to mount within 10 seconds`; user sees a blank white screen and then a “Loading Error……” after a few seconds (app still not mounting).",
-    "Production console shows warning: 'Detected both agent and agentOptions passed to createActor. Ignoring agentOptions...'",
-    "Production console shows chextloader initialization log; user requests it be fixed/removed."
-  ],
+  "projectStateVersion": 3,
+  "summary": "Build a Tinder-style dating app UI including swipe cards, user profiles, matching screen, chat, and a side menu with a full-page transparent overlay; also fix mobile layout overlap issues.",
+  "architectural_notes": [],
+  "known_issues": [],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-configure-the-bhetghat-web-app-as-an-installable-progressive-web-app-pwa-so-users-on-android-chrome-and-ios-safari-can-add-it-to-their-home-screen-and-launch-it-full-screen",
-      "title": "Configure the Bhetghat web app as an installable Progressive Web App (PWA) so users on Android (Chrome) and iOS (Safari) can add it to their home screen and launch it full-screen.",
+      "id": "feature-change-the-side-menu-sheet-behavior-so-that-when-it-opens-it-renders-a-full-viewport-transparent-overlay-over-the-entire-page-including-the-area-where-the-menu-icon-is-without-darkening-the-page-the-overlay-must-block-interaction-with-underlying-content-and-clicking-tapping-the-overlay-must-close-the-menu",
+      "title": "Change the side menu (Sheet) behavior so that when it opens it renders a full-viewport transparent overlay over the entire page (including the area where the menu icon is), without darkening the page; the overlay must block interaction with underlying content and clicking/tapping the overlay must close the menu.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-basic-offline-support-for-the-pwa-shell-using-a-service-worker-so-the-app-can-start-and-show-a-friendly-offline-screen-message-when-the-network-is-unavailable",
-      "title": "Add basic offline support for the PWA shell using a service worker so the app can start and show a friendly offline screen/message when the network is unavailable.",
+      "id": "feature-fix-the-mobile-layout-issue-where-a-section-overlaps-the-home-screen-by-correcting-responsive-spacing-stacking-so-home-content-is-fully-visible-and-not-covered-by-header-footer-navigation-elements-on-common-mobile-breakpoints",
+      "title": "Fix the mobile layout issue where a section overlaps the Home screen by correcting responsive spacing/stacking so Home content is fully visible and not covered by header/footer/navigation elements on common mobile breakpoints.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-an-in-app-install-entry-point-that-explains-in-both-english-and-nepali-how-to-install-the-app-on-android-and-iphone-add-to-home-screen",
-      "title": "Add an in-app “Install” entry point that explains, in both English and Nepali, how to install the app on Android and iPhone (Add to Home Screen).",
+      "id": "feature-make-swipe-cards-functional-end-to-end-discovery-must-provide-a-stable-identifier-principal-for-each-profile-card-and-like-pass-actions-must-call-the-backend-likeprofile-rejectprofile-mutations-for-the-currently-shown-card-and-then-advance-to-the-next-card",
+      "title": "Make swipe cards functional end-to-end: discovery must provide a stable identifier (Principal) for each profile card, and Like/Pass actions must call the backend likeProfile/rejectProfile mutations for the currently shown card and then advance to the next card.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-bilingual-english-nepali-ui-text-support-across-the-app-with-a-user-accessible-language-toggle-and-a-default-language-selection",
-      "title": "Implement bilingual (English + Nepali) UI text support across the app with a user-accessible language toggle and a default language selection.",
+      "id": "feature-implement-a-real-matching-screen-flow-when-a-like-results-in-a-mutual-match-show-a-dedicated-it-s-a-match-screen-modal-with-both-users-basic-info-and-a-primary-action-to-start-chat-plus-a-secondary-action-to-keep-swiping",
+      "title": "Implement a real matching screen/flow: when a Like results in a mutual match, show a dedicated ‘It’s a match’ screen/modal with both users’ basic info and a primary action to start chat, plus a secondary action to keep swiping.",
       "reqIds": [
         "REQ-4"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-a-coherent-distinct-visual-theme-for-bhetghat-colors-typography-spacing-and-component-styling-and-apply-it-consistently-across-all-screens",
-      "title": "Create a coherent, distinct visual theme for Bhetghat (colors, typography, spacing, and component styling) and apply it consistently across all screens.",
+      "id": "feature-make-the-matches-page-list-real-matches-by-adding-using-backend-support-to-fetch-the-caller-s-matched-users-including-their-principals-and-render-them-in-the-existing-matches-page-selecting-a-match-must-open-chat-with-the-correct-match-principal",
+      "title": "Make the Matches page list real matches by adding/using backend support to fetch the caller’s matched users (including their principals) and render them in the existing Matches page; selecting a match must open Chat with the correct match principal.",
       "reqIds": [
         "REQ-5"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-an-authenticated-onboarding-flow-in-the-frontend-that-prompts-logged-in-users-to-create-their-profile-if-they-do-not-have-one-yet-and-prevents-access-to-matching-chat-until-onboarding-is-complete",
-      "title": "Add an authenticated onboarding flow in the frontend that prompts logged-in users to create their profile if they do not have one yet, and prevents access to matching/chat until onboarding is complete.",
+      "id": "feature-apply-a-cohesive-tinder-like-ui-style-2-refresh-across-home-cards-matches-list-items-and-chat-message-bubbles-header-while-keeping-user-facing-copy-in-english-update-colors-spacing-typography-and-animations-consistently-without-switching-the-app-to-dark-mode",
+      "title": "Apply a cohesive Tinder-like ‘UI style 2’ refresh across Home (cards), Matches (list items), and Chat (message bubbles/header) while keeping user-facing copy in English; update colors, spacing, typography, and animations consistently without switching the app to dark mode.",
       "reqIds": [
         "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-tinder-style-discovery-and-swipe-actions-show-a-stack-list-of-candidate-profiles-and-let-users-like-or-pass-persist-these-actions-and-create-a-match-when-both-users-like-each-other",
-      "title": "Implement Tinder-style discovery and swipe actions: show a stack/list of candidate profiles and let users Like or Pass; persist these actions and create a Match when both users Like each other.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-matches-page-that-lists-matches-for-the-logged-in-user-and-allows-opening-a-chat-thread-with-a-selected-match",
-      "title": "Implement a Matches page that lists matches for the logged-in user and allows opening a chat thread with a selected match.",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-chat-messaging-that-is-only-available-between-matched-users-including-sending-messages-and-loading-message-history-via-backend-apis-no-real-time-sockets",
-      "title": "Implement chat messaging that is only available between matched users, including sending messages and loading message history via backend APIs (no real-time sockets).",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-a-profile-page-for-viewing-and-editing-the-logged-in-user-s-profile-and-ensure-navigation-entries-home-matches-profile-settings-lead-to-functional-screens-rather-than-the-current-placeholder",
-      "title": "Implement a Profile page for viewing and editing the logged-in user’s profile, and ensure navigation entries (Home/Matches/Profile/Settings) lead to functional screens rather than the current placeholder.",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-advertisement-placement-slots-in-the-ui-as-non-interactive-placeholders-images-to-be-provided-later-and-ensure-they-do-not-block-core-matching-chat-flows",
-      "title": "Add advertisement placement slots in the UI as non-interactive placeholders (images to be provided later), and ensure they do not block core matching/chat flows.",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-and-include-required-pwa-icon-assets-as-static-files-under-frontend-public-assets-generated-matching-the-filenames-already-referenced-by-the-manifest-and-index-html",
-      "title": "Generate and include required PWA icon assets as static files under frontend/public/assets/generated, matching the filenames already referenced by the manifest and index.html.",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-identify-and-fix-the-root-cause-of-the-deployment-build-failure-reported-as-a-system-configuration-error-by-validating-the-project-s-build-inputs-frontend-static-asset-references-backend-canister-compilation-and-making-any-necessary-code-config-adjustments-so-the-app-builds-and-deploys-successfully",
-      "title": "Identify and fix the root cause of the deployment/build failure reported as a “System configuration error” by validating the project’s build inputs (frontend static asset references + backend canister compilation) and making any necessary code/config adjustments so the app builds and deploys successfully.",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-harden-the-service-worker-cache-list-in-frontend-public-sw-js-to-avoid-caching-non-deployable-source-paths-e-g-src-tsx-and-ensure-offline-fallback-behavior-does-not-cause-build-deploy-issues-when-assets-are-missing-or-paths-differ-between-dev-and-production-builds",
-      "title": "Harden the service worker cache list in frontend/public/sw.js to avoid caching non-deployable source paths (e.g., /src/*.tsx) and ensure offline fallback behavior does not cause build/deploy issues when assets are missing or paths differ between dev and production builds.",
-      "reqIds": [
-        "REQ-16"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-react-query-hooks-in-frontend-src-hooks-usequeries-ts-that-call-the-backend-actor-via-the-existing-useactor-hook-for-all-core-operations-profile-crud-for-the-logged-in-user-discovery-candidate-retrieval-like-pass-actions-match-listing-message-sending-and-message-history-loading",
-      "title": "Create React Query hooks in frontend/src/hooks/useQueries.ts that call the backend actor (via the existing useActor hook) for all core operations: profile CRUD for the logged-in user, discovery candidate retrieval, Like/Pass actions, match listing, message sending, and message history loading.",
-      "reqIds": [
-        "REQ-18"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-logged-in-coming-soon-placeholder-in-frontend-src-app-tsx-with-functional-screens-for-home-discovery-matches-list-chat-thread-view-profile-view-edit-onboarding-completion-and-settings-wired-to-the-navigation-in-applayout-so-each-nav-item-leads-to-a-working-page",
-      "title": "Replace the logged-in “Coming Soon” placeholder in frontend/src/App.tsx with functional screens for Home (discovery), Matches (list), Chat (thread view), Profile (view/edit + onboarding completion), and Settings, wired to the navigation in AppLayout so each nav item leads to a working page.",
-      "reqIds": [
-        "REQ-19"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-all-user-facing-ui-text-on-newly-implemented-pages-is-in-english-by-default-and-uses-the-existing-i18n-translation-system-english-nepali-rather-than-hardcoded-strings-including-removing-hardcoded-english-only-copy-currently-present-on-the-installhelp-page-e-g-the-why-install-card",
-      "title": "Ensure all user-facing UI text on newly implemented pages is in English by default and uses the existing i18n translation system (English + Nepali) rather than hardcoded strings, including removing hardcoded English-only copy currently present on the InstallHelp page (e.g., the “Why Install?” card).",
-      "reqIds": [
-        "REQ-20"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-identify-and-fix-the-root-cause-of-the-blank-page-when-loading-the-live-app-url-https-bhetghat-fus-caffeine-xyz-caffeineadmintoken-395b6a2151fafdc39fa90aebf92986d202bc821f82a49ff78af6359a5bbfba40-so-that-the-react-app-consistently-mounts-and-renders-ui-welcome-or-authenticated-app-instead-of-a-blank-screen",
-      "title": "Identify and fix the root cause of the blank page when loading the live app URL `https://bhetghat-fus.caffeine.xyz/#caffeineAdminToken=395b6a2151fafdc39fa90aebf92986d202bc821f82a49ff78af6359a5bbfba40` so that the React app consistently mounts and renders UI (Welcome or authenticated app) instead of a blank screen.",
-      "reqIds": [
-        "REQ-21"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-user-visible-fatal-error-fallback-so-that-if-the-app-encounters-an-unexpected-runtime-error-during-initialization-render-the-page-shows-a-clear-english-error-screen-with-a-reload-action-and-basic-guidance-instead-of-appearing-blank",
-      "title": "Add a user-visible fatal error fallback so that if the app encounters an unexpected runtime error during initialization/render, the page shows a clear English error screen with a “Reload” action and basic guidance, instead of appearing blank.",
-      "reqIds": [
-        "REQ-22"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-caffeineadmintoken-hash-format-used-in-the-provided-live-url-does-not-break-client-routing-app-initialization-and-that-admin-token-extraction-handling-cannot-crash-the-app-if-the-token-is-missing-malformed-or-rejected-by-initialization-calls",
-      "title": "Ensure the `#caffeineAdminToken=...` hash format used in the provided live URL does not break client routing/app initialization, and that admin-token extraction/handling cannot crash the app if the token is missing, malformed, or rejected by initialization calls.",
-      "reqIds": [
-        "REQ-23"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-identify-and-fix-the-root-cause-of-the-blank-page-so-that-the-react-app-consistently-mounts-and-renders-ui-when-loading-the-live-production-url-https-bhetghat-fus-caffeine-xyz-caffeineadmintoken-be275a32ffc37df44b28884d78a70ea1e87ac5df8e22dd1aa9226179ce575367-hash-only-admin-token-format-and-ensure-admin-token-extraction-handling-cannot-crash-initialization-even-if-the-token-is-missing-malformed-or-rejected",
-      "title": "Identify and fix the root cause of the blank page so that the React app consistently mounts and renders UI when loading the live production URL `https://bhetghat-fus.caffeine.xyz/#caffeineAdminToken=be275a32ffc37df44b28884d78a70ea1e87ac5df8e22dd1aa9226179ce575367` (hash-only admin token format), and ensure admin-token extraction/handling cannot crash initialization even if the token is missing, malformed, or rejected.",
-      "reqIds": [
-        "REQ-24"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-fix-the-production-app-entry-point-so-the-deployed-site-does-not-attempt-to-load-the-non-deployable-source-path-src-main-tsx-which-causes-a-blank-white-page-and-instead-loads-the-correct-built-javascript-entry-bundle-for-the-react-app",
-      "title": "Fix the production app entry point so the deployed site does not attempt to load the non-deployable source path `/src/main.tsx` (which causes a blank white page) and instead loads the correct built JavaScript entry bundle for the React app.",
-      "reqIds": [
-        "REQ-25"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-pwa-service-worker-does-not-keep-serving-an-older-cached-index-html-that-points-to-src-main-tsx-after-the-entry-point-fix-is-deployed",
-      "title": "Ensure the PWA service worker does not keep serving an older cached `index.html` that points to `/src/main.tsx` after the entry point fix is deployed.",
-      "reqIds": [
-        "REQ-26"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-temporarily-disable-service-worker-behavior-in-production-so-the-app-always-loads-a-fresh-network-index-html-and-does-not-serve-cached-html-js-to-help-resolve-the-persistent-blank-page-issue",
-      "title": "Temporarily disable service worker behavior in production so the app always loads a fresh network `index.html` and does not serve cached HTML/JS, to help resolve the persistent blank page issue.",
-      "reqIds": [
-        "REQ-27"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-on-app-startup-before-importing-the-react-bundle-proactively-unregister-any-existing-service-worker-registrations-for-this-origin-and-clear-existing-caches-created-by-prior-service-worker-versions",
-      "title": "On app startup (before importing the React bundle), proactively unregister any existing service worker registrations for this origin and clear existing caches created by prior service worker versions.",
-      "reqIds": [
-        "REQ-28"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-prevent-the-react-app-or-any-other-client-code-from-re-registering-a-service-worker-while-this-temporary-disablement-is-in-effect",
-      "title": "Prevent the React app (or any other client code) from re-registering a service worker while this temporary disablement is in effect.",
-      "reqIds": [
-        "REQ-29"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-fix-the-production-startup-path-so-the-deployed-app-never-attempts-to-import-the-dev-only-entry-src-main-tsx-in-production-and-the-react-app-reliably-mounts-renders-welcome-or-authenticated-ui-when-opening-the-live-url-https-bhetghat-fus-caffeine-xyz-caffeineadmintoken-b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e",
-      "title": "Fix the production startup path so the deployed app never attempts to import the dev-only entry `/src/main.tsx` in production, and the React app reliably mounts (renders Welcome or authenticated UI) when opening the live URL `https://bhetghat-fus.caffeine.xyz/#caffeineAdminToken=b8def835a51005b977429f18e2f7840712f07bbe076b0db3d78b04cc1724815e`.",
-      "reqIds": [
-        "REQ-30"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-pwa-meta-tags-in-frontend-index-html-to-address-the-deprecation-warning-by-including-meta-name-mobile-web-app-capable-content-yes-while-keeping-existing-apple-tags-as-needed",
-      "title": "Update PWA meta tags in `frontend/index.html` to address the deprecation warning by including `<meta name=\"mobile-web-app-capable\" content=\"yes\">` (while keeping existing Apple tags as needed).",
-      "reqIds": [
-        "REQ-32"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-resolve-the-manifest-icon-validation-download-error-by-ensuring-all-icon-files-referenced-by-frontend-public-manifest-webmanifest-and-frontend-index-html-exist-under-frontend-public-assets-generated-and-are-valid-png-images-correct-content-correct-dimensions-and-successfully-served-in-particular-fix-https-bhetghat-fus-caffeine-xyz-assets-generated-pwa-icon-dim-192x192-png-so-the-browser-no-longer-reports-it-as-an-invalid-image-download-error",
-      "title": "Resolve the manifest icon validation/download error by ensuring all icon files referenced by `frontend/public/manifest.webmanifest` and `frontend/index.html` exist under `frontend/public/assets/generated/` and are valid PNG images (correct content, correct dimensions, and successfully served). In particular, fix `https://bhetghat-fus.caffeine.xyz/assets/generated/pwa-icon.dim_192x192.png` so the browser no longer reports it as an invalid image/download error.",
-      "reqIds": [
-        "REQ-34"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-fix-the-production-startup-so-the-react-app-reliably-mounts-and-the-live-site-no-longer-stays-blank-white-screen-and-then-shows-a-delayed-loading-error-boot-watchdog-error",
-      "title": "Fix the production startup so the React app reliably mounts and the live site no longer stays blank (white screen) and then shows a delayed “Loading Error”/boot watchdog error.",
-      "reqIds": [
-        "REQ-35"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-frontend-index-html-so-it-loads-the-react-application-entry-in-addition-to-entry-loader-js-the-current-html-only-includes-entry-loader-js-so-react-never-mounts-ensure-the-production-build-outputs-an-index-html-that-references-the-built-js-bundle-e-g-under-assets-rather-than-a-dev-only-source-path",
-      "title": "Update `frontend/index.html` so it loads the React application entry in addition to `entry-loader.js` (the current HTML only includes `/entry-loader.js`, so React never mounts). Ensure the production build outputs an `index.html` that references the built JS bundle (e.g., under `/assets/...`) rather than a dev-only source path.",
-      "reqIds": [
-        "REQ-36"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-prevent-the-runtime-crash-usei18n-must-be-used-within-i18nprovider-by-ensuring-the-rendered-app-is-wrapped-in-i18nprovider-before-any-component-calls-usei18n-notably-applayout-and-languagetoggle-because-frontend-src-main-tsx-is-immutable-implement-the-provider-wrapping-within-frontend-src-app-tsx-or-a-new-wrapper-component-used-by-app",
-      "title": "Prevent the runtime crash `useI18n must be used within I18nProvider` by ensuring the rendered app is wrapped in `I18nProvider` before any component calls `useI18n` (notably `AppLayout` and `LanguageToggle`). Because `frontend/src/main.tsx` is immutable, implement the provider wrapping within `frontend/src/App.tsx` (or a new wrapper component used by `App`).",
-      "reqIds": [
-        "REQ-37"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-fatal-startup-runtime-errors-render-a-user-visible-error-ui-instead-of-leaving-the-page-blank-by-wiring-the-existing-fatalerrorboundary-high-enough-in-the-react-tree-wrap-the-app-content-in-frontend-src-app-tsx-since-main-tsx-is-immutable-user-facing-text-shown-by-this-fallback-must-be-english",
-      "title": "Ensure fatal startup/runtime errors render a user-visible error UI instead of leaving the page blank by wiring the existing `FatalErrorBoundary` high enough in the React tree (wrap the app content in `frontend/src/App.tsx`, since `main.tsx` is immutable). User-facing text shown by this fallback must be English.",
-      "reqIds": [
-        "REQ-38"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-the-global-navbar-header-ui-so-a-menu-icon-is-visible-on-desktop-web-and-is-positioned-at-the-top-right-of-the-page-and-clicking-it-opens-the-same-right-side-navigation-sheet-currently-used-on-mobile",
-      "title": "Update the global Navbar header UI so a menu icon is visible on desktop/web and is positioned at the top-right of the page, and clicking it opens the same right-side navigation sheet currently used on mobile.",
-      "reqIds": [
-        "REQ-40"
       ],
       "version": 1
     }
@@ -304,109 +58,56 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Create Bhetghat dating app (Tinder-like) with account creation/login and onboarding",
+      "summary": "Add full-page transparent overlay behind the side menu when opened (not darkened).",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Tinder-style swipe matching and match logic",
+      "summary": "Fix mobile UI section overlapping the home screen (layout/stacking issue).",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Detailed profile fields/options (rich profile choices)",
+      "summary": "Implement Tinder-style swipe cards experience.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Chat/messaging unlocked after matching",
+      "summary": "Add user profile screens/features.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-5",
-      "summary": "Advertisement placement/slots within the app (upload images later)",
+      "summary": "Add matching screen/flow.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-6",
-      "summary": "Bilingual UI support (English and Nepali)",
+      "summary": "Add chat/messaging feature.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-7",
-      "summary": "Make the web app installable as a PWA (Add to Home Screen) with mobile-optimized UX",
+      "summary": "Apply Tinder-like overall UI style across the app.",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Implement backend data models and APIs for user profiles, using the authenticated Internet Identity Principal as the user identifier.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Ensure all files referenced by PWA configuration are present and correctly located under frontend/public (manifest + index.html), specifically all icon files referenced by frontend/public/manifest.webmanifest and frontend/index.html.",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-11",
-      "summary": "Implement the Motoko backend canister in backend/main.mo to support Bhetghat’s core functionality (profiles, discovery/swipes, matches, and chat) using the authenticated Internet Identity Principal as the user identifier, and expose the required candid methods for the frontend to call.",
-      "reqIds": [
-        "REQ-17"
-      ],
       "status": "pending"
     },
     {
       "id": "AR-13",
-      "summary": "Resolve the manifest icon download/validation error by ensuring all icon files referenced by `frontend/public/manifest.webmanifest` and `frontend/index.html` exist under `frontend/public/assets/generated/` and are valid PNG images served with a successful HTTP response.",
+      "summary": "Fix backend match/chat identity correctness by implementing a deterministic, collision-resistant match/chat ID derived from both principals (instead of returning a constant), and ensure all match-related stores (matchStore/chatStore/signalingStore) use this ID consistently.",
       "reqIds": [
-        "REQ-31"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-14",
-      "summary": "Fix the runtime startup crash `useI18n must be used within I18nProvider` by ensuring the React component tree is wrapped in `I18nProvider` before any component calls `useI18n` (including `AppLayout` and `LanguageToggle`). Because `frontend/src/main.tsx` is immutable, apply the provider wrapping within `frontend/src/App.tsx` (or a new wrapper component used by `App`) so the app can render without throwing.",
-      "reqIds": [
-        "REQ-33"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Fix console warnings/logs in production: 'Detected both agent and agentOptions passed to createActor' and remove/disable chextloader initialization log",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-16",
-      "summary": "Add/show a menu icon on the Navbar in desktop/web view, positioned at the top-right of the page",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-17",
-      "summary": "Remove the production console warning `Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.` by ensuring the frontend actor creation path passes only one of `agent` or `agentOptions` to the underlying `createActor` implementation (including the authenticated identity case in `frontend/src/hooks/useActor.ts`).",
-      "reqIds": [
-        "REQ-39"
+        "REQ-6"
       ],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "Bhetghat",
+  "projectName": "Tinder-style swipe + matching/chat flow, transparent menu overlay, and mobile overlap fixes",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

@@ -1,44 +1,141 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-12T16:35:56.215Z",
+  "generatedAt": "2026-02-13T02:30:27.383Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 1,
+    "total": 7,
+    "implemented": 6,
     "items": [
       {
-        "id": "REQ-39",
-        "summary": "Remove the production console warning `Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.` by ensuring the frontend actor creation path passes only one of `agent` or `agentOptions` to the underlying `createActor` implementation (including the authenticated identity case in `frontend/src/hooks/useActor.ts`).",
-        "status": "missing",
+        "id": "REQ-1",
+        "summary": "Change the side menu (Sheet) behavior so that when it opens it renders a full-viewport transparent overlay over the entire page (including the area where the menu icon is), without darkening the page; the overlay must block interaction with underlying content and clicking/tapping the overlay must close the menu.",
+        "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useActor.ts",
-          "frontend/src/config.ts"
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/index.css"
         ],
+        "matchedFiles": [
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Fix the mobile layout issue where a section overlaps the Home screen by correcting responsive spacing/stacking so Home content is fully visible and not covered by header/footer/navigation elements on common mobile breakpoints.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/index.css"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Make swipe cards functional end-to-end: discovery must provide a stable identifier (Principal) for each profile card, and Like/Pass actions must call the backend likeProfile/rejectProfile mutations for the currently shown card and then advance to the next card.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Implement a real matching screen/flow: when a Like results in a mutual match, show a dedicated ‘It’s a match’ screen/modal with both users’ basic info and a primary action to start chat, plus a secondary action to keep swiping.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/ItsAMatchModal.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/ItsAMatchModal.tsx",
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Make the Matches page list real matches by adding/using backend support to fetch the caller’s matched users (including their principals) and render them in the existing Matches page; selecting a match must open Chat with the correct match principal.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/Matches.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/Chat.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/Matches.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/Chat.tsx"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Fix backend match/chat identity correctness by implementing a deterministic, collision-resistant match/chat ID derived from both principals (instead of returning a constant), and ensure all match-related stores (matchStore/chatStore/signalingStore) use this ID consistently.",
+        "status": "unknown",
+        "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-40",
-        "summary": "Update the global Navbar header UI so a menu icon is visible on desktop/web and is positioned at the top-right of the page, and clicking it opens the same right-side navigation sheet currently used on mobile.",
+        "id": "REQ-7",
+        "summary": "Apply a cohesive Tinder-like ‘UI style 2’ refresh across Home (cards), Matches (list items), and Chat (message bubbles/header) while keeping user-facing copy in English; update colors, spacing, typography, and animations consistently without switching the app to dark mode.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AppLayout.tsx"
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/Matches.tsx",
+          "frontend/src/pages/Chat.tsx",
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js"
         ],
         "matchedFiles": [
-          "frontend/src/components/AppLayout.tsx"
+          "frontend/src/pages/Home.tsx",
+          "frontend/src/pages/Matches.tsx",
+          "frontend/src/pages/Chat.tsx",
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
+    "frontend/src/App.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
     "frontend/src/components/AppLayout.tsx",
+    "frontend/src/components/ItsAMatchModal.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/hooks/useVideoCall.ts",
+    "frontend/src/i18n/translations.ts",
+    "frontend/src/index.css",
+    "frontend/src/pages/Chat.tsx",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/Matches.tsx",
+    "frontend/src/utils/chatId.ts",
+    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

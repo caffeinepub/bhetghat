@@ -6,9 +6,10 @@ import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { MessageCircle, Users, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import type { DatingProfile } from '../backend';
+import type { Principal } from '@dfinity/principal';
 
 interface MatchesProps {
-  onSelectMatch: (profile: DatingProfile) => void;
+  onSelectMatch: (profile: DatingProfile, principal: Principal) => void;
 }
 
 export function Matches({ onSelectMatch }: MatchesProps) {
@@ -41,7 +42,7 @@ export function Matches({ onSelectMatch }: MatchesProps) {
   }
 
   return (
-    <div className="container max-w-4xl py-8 px-4">
+    <div className="container max-w-4xl py-6 px-4 sm:py-8">
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-2">{t('yourMatches')}</h1>
         <p className="text-sm text-muted-foreground">
@@ -49,25 +50,35 @@ export function Matches({ onSelectMatch }: MatchesProps) {
         </p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        {matches.map((match, idx) => (
-          <Card key={idx} className="hover:shadow-lg transition-shadow cursor-pointer" onClick={() => onSelectMatch(match)}>
-            <CardHeader className="flex flex-row items-center gap-4 space-y-0">
-              <Avatar className="h-16 w-16">
-                <AvatarImage src={match.profilePicUrl} alt={match.firstName} />
-                <AvatarFallback>{match.firstName[0]}{match.lastName[0]}</AvatarFallback>
-              </Avatar>
-              <div className="flex-1">
-                <CardTitle className="text-lg">
-                  {match.firstName} {match.lastName}
-                </CardTitle>
-                <CardDescription>
-                  {match.age} • {match.location}
-                </CardDescription>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {matches.map((match) => (
+          <Card 
+            key={match.principal.toString()} 
+            className="hover:shadow-xl transition-all cursor-pointer rounded-2xl border-2 overflow-hidden group"
+            onClick={() => onSelectMatch(match.profile, match.principal)}
+          >
+            <div className="aspect-square bg-muted relative overflow-hidden">
+              {match.profile.profilePicUrl && (
+                <img
+                  src={match.profile.profilePicUrl}
+                  alt={match.profile.firstName}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                  }}
+                />
+              )}
+              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4">
+                <h3 className="text-white font-bold text-lg">
+                  {match.profile.firstName} {match.profile.lastName}
+                </h3>
+                <p className="text-white/90 text-sm">
+                  {match.profile.age} • {match.profile.location}
+                </p>
               </div>
-            </CardHeader>
-            <CardContent>
-              <Button className="w-full" variant="outline">
+            </div>
+            <CardContent className="p-4">
+              <Button className="w-full rounded-full" variant="outline">
                 <MessageCircle className="h-4 w-4 mr-2" />
                 {t('sendMessage')}
               </Button>

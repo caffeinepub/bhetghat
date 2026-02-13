@@ -1,74 +1,157 @@
 {
   "kind": "build_request",
-  "title": "Fix createActor agentOptions warning and show Navbar menu icon on desktop",
+  "title": "Tinder-style swipe + matching/chat flow, transparent menu overlay, and mobile overlap fixes",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-39",
-      "text": "Remove the production console warning `Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.` by ensuring the frontend actor creation path passes only one of `agent` or `agentOptions` to the underlying `createActor` implementation (including the authenticated identity case in `frontend/src/hooks/useActor.ts`).",
+      "id": "REQ-1",
+      "text": "Change the side menu (Sheet) behavior so that when it opens it renders a full-viewport transparent overlay over the entire page (including the area where the menu icon is), without darkening the page; the overlay must block interaction with underlying content and clicking/tapping the overlay must close the menu.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5",
-          "msg-12"
+          "msg-1"
         ],
         "quotes": [
-          "index-jhAZLbjQ.js:24578 Detected both agent and agentOptions passed to createActor. Ignoring agentOptions and proceeding with the provided agent.",
-          "Understand this warning",
-          "please proceed"
+          "whole page not darken but overlay (transparently).  menu side is fine."
         ]
       },
       "acceptanceCriteria": [
-        "When loading the live production build, the browser console no longer logs `Detected both agent and agentOptions passed to createActor...` during normal app startup/authenticated usage.",
-        "Authenticated users still create an actor that uses the logged-in Internet Identity `identity` (no regression in login-required flows)."
+        "Opening the menu shows an overlay that covers the full viewport and prevents clicks/scroll on the underlying page.",
+        "The overlay uses a transparent (non-darkening) treatment (e.g., clear with optional subtle blur) rather than a dimming layer.",
+        "Clicking/tapping the overlay closes the menu.",
+        "Menu continues to open from the same side as it does now."
       ]
     },
     {
-      "id": "REQ-40",
-      "text": "Update the global Navbar header UI so a menu icon is visible on desktop/web and is positioned at the top-right of the page, and clicking it opens the same right-side navigation sheet currently used on mobile.",
+      "id": "REQ-2",
+      "text": "Fix the mobile layout issue where a section overlaps the Home screen by correcting responsive spacing/stacking so Home content is fully visible and not covered by header/footer/navigation elements on common mobile breakpoints.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7",
-          "msg-10",
-          "msg-11",
-          "msg-12"
+          "msg-1"
         ],
         "quotes": [
-          "show menu icon in web version",
-          "put menu icon on the righthand top of the page that opens at browser",
-          "Navbar",
-          "please proceed"
+          "the moblie section overlap the home screen of the app. Please fix it."
         ]
       },
       "acceptanceCriteria": [
-        "On desktop viewport widths, the header shows a menu (hamburger) icon on the top-right.",
-        "Clicking the menu icon opens the right-side navigation sheet and navigation items work as before.",
-        "On mobile viewport widths, the menu icon still works and the navigation sheet still opens correctly (no regression)."
+        "On mobile viewport sizes (e.g., ~360x800), the Home page content is not overlapped by the header, footer, or any fixed/sticky UI.",
+        "Scrolling and tapping Like/Pass controls on Home works without any UI element covering them.",
+        "No new horizontal scrolling is introduced on mobile."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Make swipe cards functional end-to-end: discovery must provide a stable identifier (Principal) for each profile card, and Like/Pass actions must call the backend likeProfile/rejectProfile mutations for the currently shown card and then advance to the next card.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "swipe cards, user profile, matching screen, chat"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each displayed discover card has an associated Principal available in the UI layer (not guessed).",
+        "Tapping Like calls likeProfile(targetPrincipal) and advances to the next card on success.",
+        "Tapping Pass calls rejectProfile(targetPrincipal) and advances to the next card on success.",
+        "The discovery list does not include the caller’s own profile.",
+        "Error cases from like/reject are handled with a user-visible message and do not break navigation."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Implement a real matching screen/flow: when a Like results in a mutual match, show a dedicated ‘It’s a match’ screen/modal with both users’ basic info and a primary action to start chat, plus a secondary action to keep swiping.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "matching screen"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When likeProfile returns a mutual match, the UI shows a match screen/modal immediately.",
+        "The match screen provides a clear action to open Chat with that matched user and an action to dismiss and continue swiping.",
+        "After dismissing the match screen, the user returns to the discover flow at the next card (not reset to the beginning)."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Make the Matches page list real matches by adding/using backend support to fetch the caller’s matched users (including their principals) and render them in the existing Matches page; selecting a match must open Chat with the correct match principal.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "matching screen, chat"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Matches page shows a non-empty list when matches exist on the backend.",
+        "Each match item includes enough data to open Chat with the correct match principal.",
+        "Selecting a match opens Chat and messages load successfully for that match.",
+        "No placeholder ‘return []’ behavior remains for matches fetching."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Fix backend match/chat identity correctness by implementing a deterministic, collision-resistant match/chat ID derived from both principals (instead of returning a constant), and ensure all match-related stores (matchStore/chatStore/signalingStore) use this ID consistently.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "swipe cards, user profile, matching screen, chat"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The match ID differs for different principal pairs and is the same regardless of ordering (A,B) vs (B,A).",
+        "After two users mutually like, they can send and retrieve messages without errors.",
+        "Unmatching removes the correct match entry for that pair and prevents further messaging afterward.",
+        "Video signaling retrieval continues to validate membership using the corrected match ID."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Apply a cohesive Tinder-like ‘UI style 2’ refresh across Home (cards), Matches (list items), and Chat (message bubbles/header) while keeping user-facing copy in English; update colors, spacing, typography, and animations consistently without switching the app to dark mode.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "UI style 2."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Home cards look like a modern swipe/deck UI (rounded card, prominent photo area, clear Like/Pass affordances).",
+        "Matches list items and Chat styling follow the same visual system (consistent radii, shadows, typography, and primary color).",
+        "The app remains in a light theme (no forced dark mode) and the menu overlay requirement remains transparent/non-darkening.",
+        "No user-facing text is introduced in a non-English language."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts or other paths listed in SYSTEM_CONTEXT.frontend.immutablePaths.",
-    "Use English for any user-facing text introduced or modified by these changes."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional canisters/services).",
+    "Do not modify files under frontend/src/components/ui (compose them instead).",
+    "Do not modify immutable frontend paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "No third-party authentication providers; only Internet Identity.",
+    "No external databases or off-chain storage."
   ],
   "nonGoals": [
-    "Do not add new authentication providers beyond Internet Identity.",
-    "Do not implement real-time messaging (no WebSockets)."
+    "Implementing payments/subscriptions.",
+    "Adding real-time chat via WebSockets/push notifications.",
+    "Adding location/GPS/maps-based distance matching.",
+    "Implementing third-party social logins (Facebook/Google/etc.).",
+    "Implementing full parity with every Tinder feature beyond swipe, profiles, matching, and chat."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

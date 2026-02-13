@@ -7,8 +7,30 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface Message {
-    content: string;
+export type SignalingResult = {
+    __kind__: "Unmatched";
+    Unmatched: null;
+} | {
+    __kind__: "NotMatched";
+    NotMatched: null;
+} | {
+    __kind__: "TryAgain";
+    TryAgain: null;
+} | {
+    __kind__: "Success";
+    Success: string;
+} | {
+    __kind__: "BufferFull";
+    BufferFull: null;
+} | {
+    __kind__: "InvalidData";
+    InvalidData: null;
+} | {
+    __kind__: "InvalidOperation";
+    InvalidOperation: null;
+};
+export interface SignalingMessage {
+    signalingData: string;
     sender: Principal;
     timestamp: bigint;
 }
@@ -23,6 +45,7 @@ export interface DatingProfile {
     isVisible: boolean;
     personalityTraits: Array<string>;
     datingPreferences: DatingPreferences;
+    phoneNumber?: string;
     socialMedia: Array<string>;
     lastName: string;
     location: string;
@@ -37,6 +60,15 @@ export interface DatingPreferences {
     minDistance: bigint;
     maxAge: number;
     maxDistance: bigint;
+}
+export interface ChatId {
+    user1: Principal;
+    user2: Principal;
+}
+export interface Message {
+    content: string;
+    sender: Principal;
+    timestamp: bigint;
 }
 export enum Gender {
     other = "other",
@@ -54,10 +86,12 @@ export interface backendInterface {
     deleteProfile(): Promise<void>;
     getCallerUserProfile(): Promise<DatingProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getMatches(): Promise<Array<Principal>>;
     getMessages(entity: Principal): Promise<Array<Message>>;
     getOwnProfile(): Promise<DatingProfile | null>;
     getProfiles(): Promise<Array<DatingProfile>>;
     getPublicProfile(principal: Principal): Promise<DatingProfile | null>;
+    getUnreadSignalingMessages(chatId: ChatId, lastTimestamp: bigint): Promise<Array<SignalingMessage>>;
     getUserProfile(user: Principal): Promise<DatingProfile | null>;
     hideProfile(): Promise<boolean>;
     isCallerAdmin(): Promise<boolean>;
@@ -65,6 +99,7 @@ export interface backendInterface {
     rejectProfile(rejected: Principal): Promise<boolean>;
     saveCallerUserProfile(profile: DatingProfile): Promise<void>;
     sendMessage(recipient: Principal, content: string): Promise<boolean>;
+    sendVideoCallSignaling(recipient: Principal, signalingData: string): Promise<SignalingResult>;
     unmatchProfile(profile: Principal): Promise<boolean>;
     updateProfile(profile: DatingProfile): Promise<void>;
 }

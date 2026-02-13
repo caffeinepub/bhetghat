@@ -7,7 +7,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Switch } from '../components/ui/switch';
-import { Loader2, User } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { Gender, type DatingProfile } from '../backend';
 import { Alert, AlertDescription } from '../components/ui/alert';
@@ -34,6 +34,7 @@ export function Profile() {
     links: [],
     isVisible: true,
     hasVideoChatEnabled: false,
+    phoneNumber: undefined,
     datingPreferences: {
       preferredGenders: [Gender.male, Gender.female, Gender.other],
       minAge: 18,
@@ -46,6 +47,7 @@ export function Profile() {
   const [interestsInput, setInterestsInput] = useState('');
   const [hobbiesInput, setHobbiesInput] = useState('');
   const [languagesInput, setLanguagesInput] = useState('');
+  const [phoneNumberInput, setPhoneNumberInput] = useState('');
 
   useEffect(() => {
     if (profile) {
@@ -53,11 +55,14 @@ export function Profile() {
       setInterestsInput(profile.interests.join(', '));
       setHobbiesInput(profile.hobbies.join(', '));
       setLanguagesInput(profile.languages.join(', '));
+      setPhoneNumberInput(profile.phoneNumber || '');
     }
   }, [profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const trimmedPhone = phoneNumberInput.trim();
 
     const profileData: DatingProfile = {
       firstName: formData.firstName || '',
@@ -76,6 +81,7 @@ export function Profile() {
       links: formData.links || [],
       isVisible: formData.isVisible ?? true,
       hasVideoChatEnabled: formData.hasVideoChatEnabled ?? false,
+      phoneNumber: trimmedPhone || undefined,
       datingPreferences: formData.datingPreferences || {
         preferredGenders: [Gender.male, Gender.female, Gender.other],
         minAge: 18,
@@ -184,6 +190,20 @@ export function Profile() {
                 placeholder={t('locationPlaceholder')}
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">
+                {t('phoneNumber')} <span className="text-muted-foreground text-xs">({t('optional')})</span>
+              </Label>
+              <Input
+                id="phoneNumber"
+                type="tel"
+                value={phoneNumberInput}
+                onChange={(e) => setPhoneNumberInput(e.target.value)}
+                placeholder={t('phoneNumberPlaceholder')}
+              />
+              <p className="text-xs text-muted-foreground">{t('phoneNumberHelp')}</p>
             </div>
 
             <div className="space-y-2">

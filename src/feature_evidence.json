@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-change-the-side-menu-sheet-behavior-so-that-when-it-opens-it-renders-a-full-viewport-transparent-overlay-over-the-entire-page-including-the-area-where-the-menu-icon-is-without-darkening-the-page-the-overlay-must-block-interaction-with-underlying-content-and-clicking-tapping-the-overlay-must-close-the-menu",
-      "featureTitle": "Change the side menu (Sheet) behavior so that when it opens it renders a full-viewport transparent overlay over the entire page (including the area where the menu icon is), without darkening the page; the overlay must block interaction with underlying content and clicking/tapping the overlay must close the menu.",
+      "featureId": "feature-make-the-first-screen-shown-on-initial-app-load-a-dedicated-mobile-number-entry-page-with-an-input-and-two-actions-continue-save-number-and-skip-do-not-save-do-not-show-the-main-app-content-or-the-menu-button-until-the-user-chooses-continue-or-skip",
+      "featureTitle": "Make the first screen shown on initial app load a dedicated mobile-number entry page with an input and two actions: “Continue” (save number) and “Skip” (do not save). Do not show the main app content or the menu button until the user chooses Continue or Skip.",
       "files": [
-        "frontend/src/components/AppLayout.tsx",
-        "frontend/src/index.css"
+        "frontend/src/App.tsx",
+        "frontend/src/pages/MobileNumberEntry.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -23,12 +23,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-fix-the-mobile-layout-issue-where-a-section-overlaps-the-home-screen-by-correcting-responsive-spacing-stacking-so-home-content-is-fully-visible-and-not-covered-by-header-footer-navigation-elements-on-common-mobile-breakpoints",
-      "featureTitle": "Fix the mobile layout issue where a section overlaps the Home screen by correcting responsive spacing/stacking so Home content is fully visible and not covered by header/footer/navigation elements on common mobile breakpoints.",
+      "featureId": "feature-when-the-user-enters-a-mobile-number-on-the-first-screen-persist-it-so-it-can-be-used-as-the-user-s-username-by-saving-it-into-the-caller-s-profile-phone-number-field-datingprofile-phonenumber-if-the-user-is-not-yet-authenticated-or-does-not-yet-have-a-profile-at-the-time-of-entry-store-the-number-locally-and-apply-it-automatically-to-the-profile-as-soon-as-saving-the-caller-profile-becomes-possible",
+      "featureTitle": "When the user enters a mobile number on the first screen, persist it so it can be used as the user’s username by saving it into the caller’s profile phone number field (DatingProfile.phoneNumber). If the user is not yet authenticated or does not yet have a profile at the time of entry, store the number locally and apply it automatically to the profile as soon as saving the caller profile becomes possible.",
       "files": [
-        "frontend/src/components/AppLayout.tsx",
-        "frontend/src/index.css",
-        "frontend/src/pages/Home.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/hooks/usePendingPhoneNumber.ts",
+        "frontend/src/pages/MobileNumberEntry.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -45,12 +45,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-make-swipe-cards-functional-end-to-end-discovery-must-provide-a-stable-identifier-principal-for-each-profile-card-and-like-pass-actions-must-call-the-backend-likeprofile-rejectprofile-mutations-for-the-currently-shown-card-and-then-advance-to-the-next-card",
-      "featureTitle": "Make swipe cards functional end-to-end: discovery must provide a stable identifier (Principal) for each profile card, and Like/Pass actions must call the backend likeProfile/rejectProfile mutations for the currently shown card and then advance to the next card.",
+      "featureId": "feature-after-completing-the-mobile-number-entry-continue-or-skip-show-the-exact-same-next-page-content-that-the-app-currently-shows-no-removal-of-existing-features-content-including-the-existing-menu-button-and-navigation",
+      "featureTitle": "After completing the mobile-number entry (Continue or Skip), show the exact same “next page” content that the app currently shows (no removal of existing features/content), including the existing menu button and navigation.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/Home.tsx"
+        "frontend/src/App.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -67,12 +65,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-implement-a-real-matching-screen-flow-when-a-like-results-in-a-mutual-match-show-a-dedicated-it-s-a-match-screen-modal-with-both-users-basic-info-and-a-primary-action-to-start-chat-plus-a-secondary-action-to-keep-swiping",
-      "featureTitle": "Implement a real matching screen/flow: when a Like results in a mutual match, show a dedicated ‘It’s a match’ screen/modal with both users’ basic info and a primary action to start chat, plus a secondary action to keep swiping.",
+      "featureId": "feature-remove-fix-the-persistent-web-page-overlay-so-that-no-unintended-transparent-blur-overlay-blocks-interaction-after-the-menu-is-closed-specifically-ensure-that-any-overlay-used-for-the-menu-only-exists-while-the-menu-is-open-and-is-fully-removed-disabled-when-closed",
+      "featureTitle": "Remove/fix the persistent web-page overlay so that no unintended transparent/blur overlay blocks interaction after the menu is closed. Specifically, ensure that any overlay used for the menu only exists while the menu is open and is fully removed/disabled when closed.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/ItsAMatchModal.tsx",
-        "frontend/src/pages/Home.tsx"
+        "frontend/src/components/AppLayout.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -89,13 +85,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-make-the-matches-page-list-real-matches-by-adding-using-backend-support-to-fetch-the-caller-s-matched-users-including-their-principals-and-render-them-in-the-existing-matches-page-selecting-a-match-must-open-chat-with-the-correct-match-principal",
-      "featureTitle": "Make the Matches page list real matches by adding/using backend support to fetch the caller’s matched users (including their principals) and render them in the existing Matches page; selecting a match must open Chat with the correct match principal.",
+      "featureId": "feature-apply-an-orange-and-pink-background-theme-across-the-entire-app-all-pages-including-the-first-mobile-number-screen-and-the-existing-main-pages-the-background-should-clearly-show-orange-and-pink-e-g-a-gradient-and-remain-consistent-across-navigation",
+      "featureTitle": "Apply an orange-and-pink background theme across the entire app (all pages, including the first mobile-number screen and the existing main pages). The background should clearly show orange and pink (e.g., a gradient) and remain consistent across navigation.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/Chat.tsx",
-        "frontend/src/pages/Matches.tsx"
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/MobileNumberEntry.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -108,30 +103,6 @@
       ],
       "testIds": [
         "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-apply-a-cohesive-tinder-like-ui-style-2-refresh-across-home-cards-matches-list-items-and-chat-message-bubbles-header-while-keeping-user-facing-copy-in-english-update-colors-spacing-typography-and-animations-consistently-without-switching-the-app-to-dark-mode",
-      "featureTitle": "Apply a cohesive Tinder-like ‘UI style 2’ refresh across Home (cards), Matches (list items), and Chat (message bubbles/header) while keeping user-facing copy in English; update colors, spacing, typography, and animations consistently without switching the app to dark mode.",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/src/pages/Chat.tsx",
-        "frontend/src/pages/Home.tsx",
-        "frontend/src/pages/Matches.tsx",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "authorization@4.0.0",
-        "camera@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
       ],
       "confidence": "high"
     }

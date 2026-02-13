@@ -1,15 +1,15 @@
 # Specification
 
 ## Summary
-**Goal:** Improve the app’s swipe-to-match-to-chat flow and refresh UI styling while fixing mobile overlap issues and adding a transparent, full-viewport menu overlay.
+**Goal:** Show a mobile-number entry gate on first load, persist the number as the user’s phone/username when possible, fix the menu overlay behavior, and apply an orange/pink background across the app.
 
 **Planned changes:**
-- Update the side menu (Sheet) to render a full-viewport transparent overlay (non-darkening) that blocks interaction with the page, including the menu icon area, and closes the menu on tap/click.
-- Fix mobile responsive layout so Home content (including Like/Pass controls) is not overlapped by any header/footer/navigation on common mobile breakpoints, without introducing horizontal scrolling.
-- Make swipe cards functional end-to-end by ensuring each discover card carries a real backend Principal identifier; wire Like/Pass to call likeProfile/rejectProfile for the current card and advance on success, excluding the caller’s own profile and showing user-visible errors on failure.
-- Add a real match screen/modal shown immediately on mutual match with actions to start chat with the matched user or continue swiping without resetting the deck position.
-- Implement/restore backend-backed Matches fetching so the Matches page lists real matches (with principals) and selecting a match opens Chat with correct identity and messages load.
-- Fix backend match/chat identity by using a deterministic, collision-resistant match/chat ID derived from both principals (order-independent) and apply it consistently across matchStore/chatStore/signalingStore, including correct unmatch behavior.
-- Apply a cohesive “Tinder-like UI style 2” refresh across Home (cards), Matches (list items), and Chat (header/bubbles) using consistent light-theme colors, spacing, typography, and animations, keeping all user-facing text in English.
+- Add an initial mobile-number entry screen (input + Continue/Skip) that appears on fresh sessions and blocks access to the main app and menu until a choice is made.
+- Remember the Continue/Skip choice for the current session so the entry screen doesn’t reappear during navigation in that session.
+- On Continue, persist the entered mobile number and save it into the user profile phone number field (DatingProfile.phoneNumber); if the user/profile isn’t ready yet, store locally and apply automatically once profile saving is possible.
+- On Skip, do not save or overwrite any phone number.
+- Ensure the main app experience after Continue/Skip is unchanged (same pages/content and existing menu button/navigation).
+- Fix/remove any persistent click-blocking/blur overlay so the menu overlay/backdrop exists only while the menu is open and is fully removed/disabled when closed.
+- Apply a consistent orange-and-pink background theme across all pages, including the initial mobile-number screen and existing main pages.
 
-**User-visible outcome:** The user can swipe through profiles and Like/Pass reliably; mutual likes show an “It’s a match” screen with a direct path to chat; Matches lists real matched users and opens the correct chat; the menu opens with a transparent full-page overlay that closes on tap; and mobile Home no longer has overlapping UI.
+**User-visible outcome:** On first visit in a session, users must enter a mobile number or skip before seeing the app; after that they see the same app as before with a working menu (no stuck overlay), and all pages use an orange/pink background.

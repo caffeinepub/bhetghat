@@ -1,141 +1,94 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-13T02:30:27.383Z",
+  "generatedAt": "2026-02-13T02:53:49.513Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 7,
-    "implemented": 6,
+    "total": 5,
+    "implemented": 5,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Change the side menu (Sheet) behavior so that when it opens it renders a full-viewport transparent overlay over the entire page (including the area where the menu icon is), without darkening the page; the overlay must block interaction with underlying content and clicking/tapping the overlay must close the menu.",
+        "summary": "Make the first screen shown on initial app load a dedicated mobile-number entry page with an input and two actions: “Continue” (save number) and “Skip” (do not save). Do not show the main app content or the menu button until the user chooses Continue or Skip.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AppLayout.tsx",
-          "frontend/src/index.css"
+          "frontend/src/pages/MobileNumberEntry.tsx",
+          "frontend/src/App.tsx",
+          "frontend/src/i18n/translations.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/AppLayout.tsx",
-          "frontend/src/index.css"
+          "frontend/src/pages/MobileNumberEntry.tsx",
+          "frontend/src/App.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Fix the mobile layout issue where a section overlaps the Home screen by correcting responsive spacing/stacking so Home content is fully visible and not covered by header/footer/navigation elements on common mobile breakpoints.",
+        "summary": "When the user enters a mobile number on the first screen, persist it so it can be used as the user’s username by saving it into the caller’s profile phone number field (DatingProfile.phoneNumber). If the user is not yet authenticated or does not yet have a profile at the time of entry, store the number locally and apply it automatically to the profile as soon as saving the caller profile becomes possible.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/AppLayout.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/index.css"
+          "frontend/src/hooks/usePendingPhoneNumber.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/MobileNumberEntry.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/AppLayout.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/index.css"
+          "frontend/src/hooks/usePendingPhoneNumber.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/pages/MobileNumberEntry.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Make swipe cards functional end-to-end: discovery must provide a stable identifier (Principal) for each profile card, and Like/Pass actions must call the backend likeProfile/rejectProfile mutations for the currently shown card and then advance to the next card.",
+        "summary": "After completing the mobile-number entry (Continue or Skip), show the exact same “next page” content that the app currently shows (no removal of existing features/content), including the existing menu button and navigation.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/Home.tsx",
           "frontend/src/App.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/Home.tsx",
           "frontend/src/App.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Implement a real matching screen/flow: when a Like results in a mutual match, show a dedicated ‘It’s a match’ screen/modal with both users’ basic info and a primary action to start chat, plus a secondary action to keep swiping.",
+        "summary": "Remove/fix the persistent web-page overlay so that no unintended transparent/blur overlay blocks interaction after the menu is closed. Specifically, ensure that any overlay used for the menu only exists while the menu is open and is fully removed/disabled when closed.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/ItsAMatchModal.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/AppLayout.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/ItsAMatchModal.tsx",
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/App.tsx"
+          "frontend/src/components/AppLayout.tsx"
         ]
       },
       {
         "id": "REQ-5",
-        "summary": "Make the Matches page list real matches by adding/using backend support to fetch the caller’s matched users (including their principals) and render them in the existing Matches page; selecting a match must open Chat with the correct match principal.",
+        "summary": "Apply an orange-and-pink background theme across the entire app (all pages, including the first mobile-number screen and the existing main pages). The background should clearly show orange and pink (e.g., a gradient) and remain consistent across navigation.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/Matches.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/Chat.tsx"
+          "frontend/src/index.css",
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/pages/MobileNumberEntry.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/pages/Matches.tsx",
-          "frontend/src/App.tsx",
-          "frontend/src/pages/Chat.tsx"
-        ]
-      },
-      {
-        "id": "REQ-6",
-        "summary": "Fix backend match/chat identity correctness by implementing a deterministic, collision-resistant match/chat ID derived from both principals (instead of returning a constant), and ensure all match-related stores (matchStore/chatStore/signalingStore) use this ID consistently.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-7",
-        "summary": "Apply a cohesive Tinder-like ‘UI style 2’ refresh across Home (cards), Matches (list items), and Chat (message bubbles/header) while keeping user-facing copy in English; update colors, spacing, typography, and animations consistently without switching the app to dark mode.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/Matches.tsx",
-          "frontend/src/pages/Chat.tsx",
           "frontend/src/index.css",
-          "frontend/tailwind.config.js"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/pages/Matches.tsx",
-          "frontend/src/pages/Chat.tsx",
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js"
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/pages/MobileNumberEntry.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/App.tsx",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
     "frontend/src/components/AppLayout.tsx",
-    "frontend/src/components/ItsAMatchModal.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/hooks/useVideoCall.ts",
-    "frontend/src/i18n/translations.ts",
+    "frontend/src/hooks/usePendingPhoneNumber.ts",
     "frontend/src/index.css",
-    "frontend/src/pages/Chat.tsx",
-    "frontend/src/pages/Home.tsx",
-    "frontend/src/pages/Matches.tsx",
-    "frontend/src/utils/chatId.ts",
-    "frontend/tailwind.config.js",
+    "frontend/src/pages/MobileNumberEntry.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

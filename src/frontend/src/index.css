@@ -4,51 +4,51 @@
 
 @layer base {
   :root {
-    /* Pink/Rose theme colors using OKLCH */
-    --background: oklch(98% 0.01 330);
-    --foreground: oklch(20% 0.02 330);
+    /* Orange and Pink gradient theme using OKLCH */
+    --background: oklch(98% 0.02 40);
+    --foreground: oklch(20% 0.02 40);
     --card: oklch(100% 0 0);
-    --card-foreground: oklch(20% 0.02 330);
+    --card-foreground: oklch(20% 0.02 40);
     --popover: oklch(100% 0 0);
-    --popover-foreground: oklch(20% 0.02 330);
-    --primary: oklch(60% 0.18 350);
+    --popover-foreground: oklch(20% 0.02 40);
+    --primary: oklch(65% 0.20 25);
     --primary-foreground: oklch(100% 0 0);
-    --secondary: oklch(95% 0.02 330);
-    --secondary-foreground: oklch(20% 0.02 330);
-    --muted: oklch(95% 0.01 330);
-    --muted-foreground: oklch(50% 0.02 330);
-    --accent: oklch(95% 0.02 330);
-    --accent-foreground: oklch(20% 0.02 330);
+    --secondary: oklch(95% 0.02 40);
+    --secondary-foreground: oklch(20% 0.02 40);
+    --muted: oklch(95% 0.01 40);
+    --muted-foreground: oklch(50% 0.02 40);
+    --accent: oklch(95% 0.02 350);
+    --accent-foreground: oklch(20% 0.02 350);
     --destructive: oklch(55% 0.22 25);
     --destructive-foreground: oklch(100% 0 0);
-    --border: oklch(90% 0.01 330);
-    --input: oklch(90% 0.01 330);
-    --ring: oklch(60% 0.18 350);
+    --border: oklch(90% 0.01 40);
+    --input: oklch(90% 0.01 40);
+    --ring: oklch(65% 0.20 25);
     --radius: 0.75rem;
     --success: oklch(60% 0.15 145);
     --warning: oklch(70% 0.15 85);
   }
 
   .dark {
-    --background: oklch(15% 0.02 330);
-    --foreground: oklch(95% 0.01 330);
-    --card: oklch(18% 0.02 330);
-    --card-foreground: oklch(95% 0.01 330);
-    --popover: oklch(18% 0.02 330);
-    --popover-foreground: oklch(95% 0.01 330);
-    --primary: oklch(65% 0.18 350);
+    --background: oklch(15% 0.02 40);
+    --foreground: oklch(95% 0.01 40);
+    --card: oklch(18% 0.02 40);
+    --card-foreground: oklch(95% 0.01 40);
+    --popover: oklch(18% 0.02 40);
+    --popover-foreground: oklch(95% 0.01 40);
+    --primary: oklch(70% 0.20 25);
     --primary-foreground: oklch(100% 0 0);
-    --secondary: oklch(25% 0.02 330);
-    --secondary-foreground: oklch(95% 0.01 330);
-    --muted: oklch(25% 0.02 330);
-    --muted-foreground: oklch(60% 0.02 330);
-    --accent: oklch(25% 0.02 330);
-    --accent-foreground: oklch(95% 0.01 330);
+    --secondary: oklch(25% 0.02 40);
+    --secondary-foreground: oklch(95% 0.01 40);
+    --muted: oklch(25% 0.02 40);
+    --muted-foreground: oklch(60% 0.02 40);
+    --accent: oklch(25% 0.02 350);
+    --accent-foreground: oklch(95% 0.01 350);
     --destructive: oklch(50% 0.22 25);
     --destructive-foreground: oklch(100% 0 0);
-    --border: oklch(25% 0.02 330);
-    --input: oklch(25% 0.02 330);
-    --ring: oklch(65% 0.18 350);
+    --border: oklch(25% 0.02 40);
+    --input: oklch(25% 0.02 40);
+    --ring: oklch(70% 0.20 25);
     --success: oklch(55% 0.15 145);
     --warning: oklch(65% 0.15 85);
   }
@@ -58,8 +58,15 @@
   * {
     @apply border-border;
   }
+  
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background: linear-gradient(135deg, 
+      oklch(95% 0.08 25) 0%, 
+      oklch(96% 0.06 350) 50%, 
+      oklch(95% 0.08 25) 100%);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
   
   /* Ensure video elements have stable dimensions */

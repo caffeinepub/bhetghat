@@ -1,176 +1,116 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Swipe discovery + match/chat flow fixes, transparent menu overlay, and mobile overlap/layout refresh",
+  "title": "Mobile-number first-run gate, queued phone persistence, overlay fix, and orange/pink background theme",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Make the side Sheet menu open with a full-viewport transparent overlay that blocks interaction and closes the menu on tap.",
+      "summary": "Add a mobile-number entry first screen on initial load that gates the main app until Continue or Skip is chosen (remembered for the session).",
       "acceptanceCriteria": [
-        "Opening the menu shows an overlay that covers the full viewport and prevents clicks/scroll on the underlying page.",
-        "The overlay uses a transparent (non-darkening) treatment (e.g., clear with optional subtle blur) rather than a dimming layer.",
-        "Clicking/tapping the overlay closes the menu.",
-        "Menu continues to open from the same side as it does now."
+        "On a fresh session, the first UI is a mobile-number entry screen with an input, a Continue button, and a Skip button.",
+        "Before Continue/Skip, the existing authenticated pages (Home/Matches/Chat/Profile/Settings) are not visible and the menu button is not available.",
+        "After Continue or Skip, the app transitions to the existing main experience and the menu button is available (via the existing AppLayout).",
+        "The choice (Continue/Skip) is remembered for the current session so the first screen does not reappear on every navigation within the app."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AppLayout.tsx",
-          "operation": "modify",
-          "description": "Compose the existing shadcn-ui Sheet (do not modify frontend/src/components/ui) with a custom fixed-position, full-viewport transparent overlay that renders when the Sheet is open, sits above the header/menu icon, blocks pointer events/scroll, and closes the Sheet on click/tap. Use the shadcn-ui Sheet component to keep the same side-opening behavior. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/pages/MobileNumberEntry.tsx",
+          "operation": "create",
+          "description": "Create a dedicated mobile-number entry screen with a phone input and two actions (Continue/Skip). Use shadcn-ui form primitives (e.g., Card/Input/Button/Label) to keep styling consistent. Verify the component's usage instructions before implementing."
         },
         {
-          "path": "frontend/src/index.css",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Add minimal global helpers (e.g., safe fixed overlay stacking context and optional subtle backdrop blur utilities via class usage) to ensure the transparent overlay is non-darkening while still blocking interactions. Ensure this does not introduce a dimming layer."
+          "description": "Wire the mobile-number entry screen as the first rendered UI in a fresh session (before AppLayout), and persist a session flag (e.g., in sessionStorage) so the screen is only shown until Continue/Skip is chosen."
+        },
+        {
+          "path": "frontend/src/i18n/translations.ts",
+          "operation": "modify",
+          "description": "Add English user-facing strings for the new mobile-number entry screen (and ensure other languages have safe fallbacks while keeping any newly introduced/modified user-facing text in English)."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Fix mobile overlap on Home by correcting responsive spacing so content and controls are not covered by sticky/fixed UI.",
+      "summary": "Persist entered mobile number and apply it to the caller profile phoneNumber when possible; queue locally if profile save is not yet available and do nothing on Skip.",
       "acceptanceCriteria": [
-        "On mobile viewport sizes (e.g., ~360x800), the Home page content is not overlapped by the header, footer, or any fixed/sticky UI.",
-        "Scrolling and tapping Like/Pass controls on Home works without any UI element covering them.",
-        "No new horizontal scrolling is introduced on mobile."
+        "After entering a number and continuing, the number is persisted (not lost on refresh after authentication/profile save) and appears as the user’s stored phone number in Settings/Profile (where phone number is displayed today).",
+        "If the user skips, no phone number is saved/overwritten.",
+        "The app does not crash or trap if the user enters a number before authentication or before a profile exists; the number is queued locally and saved once a profile save is possible.",
+        "Backend continues to protect phoneNumber privacy exactly as it does today for other users (e.g., not exposed in getProfiles unless matched)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AppLayout.tsx",
-          "operation": "modify",
-          "description": "Adjust layout spacing for small screens: ensure the header height + safe-area are accounted for, and that main content has sufficient bottom padding so Home controls never sit behind the footer/safe-area. Keep behavior consistent across pages."
+          "path": "frontend/src/hooks/usePendingPhoneNumber.ts",
+          "operation": "create",
+          "description": "Add a small hook that manages a locally queued phone number (e.g., localStorage) and, when authentication + caller profile saving is possible, updates the caller profile phoneNumber via existing profile-save hooks; then clears the queued value. Ensure Skip never enqueues anything."
         },
         {
-          "path": "frontend/src/pages/Home.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Update Home container/card/control layout for mobile breakpoints: ensure the swipe card area and Like/Pass buttons remain fully visible, add safe-area-aware bottom spacing, and prevent any accidental horizontal overflow."
+          "description": "Invoke the pending-phone-number hook at the app level so queued numbers are applied automatically once the actor/profile is available, without affecting navigation or causing crashes."
         },
         {
-          "path": "frontend/src/index.css",
+          "path": "frontend/src/pages/MobileNumberEntry.tsx",
           "operation": "modify",
-          "description": "Refine global mobile safe-area handling so it does not cause unintended overlaps (e.g., avoid double-applying top/bottom padding in a way that conflicts with sticky header/footer). Keep the app light-themed."
+          "description": "On Continue, validate/trim and store the entered number locally for later application to the profile; on Skip, mark the gate complete without storing anything."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Make discovery cards carry a real Principal and wire Like/Pass to backend likeProfile/rejectProfile for the current card, then advance on success with error messaging.",
+      "summary": "After Continue/Skip, show the existing main app content unchanged with the existing AppLayout and menu navigation available.",
       "acceptanceCriteria": [
-        "Each displayed discover card has an associated Principal available in the UI layer (not guessed).",
-        "Tapping Like calls likeProfile(targetPrincipal) and advances to the next card on success.",
-        "Tapping Pass calls rejectProfile(targetPrincipal) and advances to the next card on success.",
-        "The discovery list does not include the caller’s own profile.",
-        "Error cases from like/reject are handled with a user-visible message and do not break navigation."
+        "After Continue/Skip, the user sees the same main app UI and pages as before this change (Home, Matches, Chat, Profile, Settings, etc.).",
+        "The header menu button is present and functional on the main app pages as it is today."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Introduce a discovery query hook that returns a list of discoverable cards with both { principal, profile } (using a backend capability that provides stable principals for discover results), and update mutations to return/propagate success and error states suitable for UI messaging. Ensure the caller’s own principal is excluded from the discover list client-side when the current principal is known."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Refactor Home to render from discover cards that include a Principal, and implement Like/Pass actions to call useLikeProfile/useRejectProfile with the current card’s principal and advance to the next card only on successful mutation. Add a user-visible error message UI (e.g., shadcn-ui Alert) for failed Like/Pass. Verify the component's usage instructions before implementing."
-        },
-        {
           "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Pass any required callbacks/state between App and Home so that discovery state (e.g., current card index) remains stable across overlays (e.g., match modal) and does not reset unexpectedly after Like/Pass flows."
+          "description": "Ensure that after the mobile-number gate completes, rendering falls through to the existing routing/page logic and uses AppLayout exactly as before (no removal of existing pages or features)."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Show an 'It’s a match' UI when a Like results in a mutual match, with actions to start chat or continue swiping without resetting the deck.",
+      "summary": "Fix the menu overlay so no transparent/blur layer remains after the menu closes; overlay/backdrop should only exist while open.",
       "acceptanceCriteria": [
-        "When likeProfile returns a mutual match, the UI shows a match screen/modal immediately.",
-        "The match screen provides a clear action to open Chat with that matched user and an action to dismiss and continue swiping.",
-        "After dismissing the match screen, the user returns to the discover flow at the next card (not reset to the beginning)."
+        "With the menu closed, there is no full-screen overlay element intercepting clicks or causing blur.",
+        "Opening the menu may show an overlay/backdrop, but it disappears immediately and completely once the menu is closed.",
+        "Users can interact with the page normally after closing the menu (no click-blocking layer remains)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/ItsAMatchModal.tsx",
-          "operation": "create",
-          "description": "Create an 'It’s a match' modal component that displays both users’ basic info (photo/name/age/location where available) and provides primary/secondary actions (Start chat / Keep swiping). Compose shadcn-ui primitives (e.g., Dialog, Card, Button, Avatar) without modifying frontend/src/components/ui. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/Home.tsx",
+          "path": "frontend/src/components/AppLayout.tsx",
           "operation": "modify",
-          "description": "On successful Like where the backend returns a mutual match (boolean true), open the 'It’s a match' modal while preserving the next-card index; wire Keep Swiping to close the modal and continue, and Start Chat to invoke App-level navigation with the matched principal."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Add App-level state/wiring to open Chat directly from the match modal with the correct matched Principal, and ensure dismissing the modal returns to Home without resetting the discovery flow."
+          "description": "Remove or refactor the custom full-screen overlay so it cannot persist after the Sheet closes (prefer relying on the shadcn-ui Sheet's own backdrop behavior rather than maintaining a separate fixed overlay). Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
       "id": "REQ-5",
-      "summary": "Make Matches page render real matches with principals and open Chat with the correct match principal, removing placeholder matches behavior.",
+      "summary": "Apply an orange-and-pink background theme across the entire app (including the first mobile-number screen) with readable content.",
       "acceptanceCriteria": [
-        "Matches page shows a non-empty list when matches exist on the backend.",
-        "Each match item includes enough data to open Chat with the correct match principal.",
-        "Selecting a match opens Chat and messages load successfully for that match.",
-        "No placeholder ‘return []’ behavior remains for matches fetching."
+        "All pages have an orange/pink background (not just a single section).",
+        "The background remains consistent when navigating between pages and when opening/closing the menu.",
+        "Text and cards remain readable against the new background (no severe contrast issues that make content unusable)."
       ],
       "file_operations": [
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Replace the placeholder matches query to fetch backend matches (principals via getMatches), then load each matched user’s public profile data for display (e.g., via getPublicProfile), returning a list of { principal, profile } for UI selection."
-        },
-        {
-          "path": "frontend/src/pages/Matches.tsx",
-          "operation": "modify",
-          "description": "Update Matches page to render match list items from {principal, profile} data, and invoke onSelectMatch with the correct principal for the selected match. Keep styling consistent with the refreshed UI. Compose existing shadcn-ui Card/Avatar/Button components without modifying frontend/src/components/ui. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/App.tsx",
-          "operation": "modify",
-          "description": "Update match selection wiring so App stores both the selected match’s profile and principal, passes the principal into Chat, and ensures Chat message loading uses the correct principal."
-        },
-        {
-          "path": "frontend/src/pages/Chat.tsx",
-          "operation": "modify",
-          "description": "Ensure Chat reliably handles a non-null matchPrincipal passed from Matches and match modal flows; add a user-visible fallback state if matchPrincipal is unexpectedly missing (without breaking navigation)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-7",
-      "summary": "Apply a cohesive Tinder-like 'UI style 2' refresh across Home cards, Matches items, and Chat UI while keeping English copy and light theme.",
-      "acceptanceCriteria": [
-        "Home cards look like a modern swipe/deck UI (rounded card, prominent photo area, clear Like/Pass affordances).",
-        "Matches list items and Chat styling follow the same visual system (consistent radii, shadows, typography, and primary color).",
-        "The app remains in a light theme (no forced dark mode) and the menu overlay requirement remains transparent/non-darkening.",
-        "No user-facing text is introduced in a non-English language."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/Home.tsx",
-          "operation": "modify",
-          "description": "Refresh Home card presentation to a modern deck style (strong photo area, rounded corners, consistent shadows, improved spacing) and refine Like/Pass affordances (button sizing, borders, micro-interactions) using existing shadcn-ui components. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/Matches.tsx",
-          "operation": "modify",
-          "description": "Update match list item visuals (consistent radii/shadows/typography, clearer primary action) to match the Home visual system using existing shadcn-ui components. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/Chat.tsx",
-          "operation": "modify",
-          "description": "Update Chat header and message bubbles to match the refreshed style (bubble radii, spacing, subtle shadows, consistent primary/neutral surfaces) while keeping all user-facing copy in English (via existing i18n keys). Verify the component's usage instructions before implementing."
-        },
         {
           "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Adjust global theme tokens/utility styling as needed to support the refreshed light UI (shadows, radii consistency) while preserving transparent/non-darkening menu overlay behavior and avoiding dark-mode-only styling."
+          "description": "Implement a global orange/pink background treatment (e.g., a gradient applied to the document/body with fixed attachment for consistency) and adjust theme variables if needed to preserve readability for text and surfaces."
         },
         {
-          "path": "frontend/tailwind.config.js",
+          "path": "frontend/src/components/AppLayout.tsx",
           "operation": "modify",
-          "description": "Extend Tailwind theme minimally (e.g., additional soft shadows/animations used by Home/Matches/Chat) to support the cohesive 'UI style 2' look without introducing dark-mode dependencies."
+          "description": "Adjust layout surface classes (root wrapper/header/footer) so the new global orange/pink background remains visible and consistent across navigation, while keeping header/footer content readable."
+        },
+        {
+          "path": "frontend/src/pages/MobileNumberEntry.tsx",
+          "operation": "modify",
+          "description": "Ensure the first-run mobile-number screen visually matches the orange/pink app background and maintains legible typography and input/button contrast using shadcn-ui components. Verify the component's usage instructions before implementing."
         }
       ]
     }

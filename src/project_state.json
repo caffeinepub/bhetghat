@@ -1,56 +1,52 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Build a Tinder-style dating app UI including swipe cards, user profiles, matching screen, chat, and a side menu with a full-page transparent overlay; also fix mobile layout overlap issues.",
-  "architectural_notes": [],
-  "known_issues": [],
+  "summary": "Web app with an initial mobile-number capture (or skip) landing page, storing the mobile number as the username, then proceeding to the existing main page (with menu), using an orange/pink theme across the entire app.",
+  "architectural_notes": [
+    "Persist mobile number as the user's username (requires storage/persistence decision)."
+  ],
+  "known_issues": [
+    "Web page still shows an overlay; needs removal/adjustment."
+  ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-change-the-side-menu-sheet-behavior-so-that-when-it-opens-it-renders-a-full-viewport-transparent-overlay-over-the-entire-page-including-the-area-where-the-menu-icon-is-without-darkening-the-page-the-overlay-must-block-interaction-with-underlying-content-and-clicking-tapping-the-overlay-must-close-the-menu",
-      "title": "Change the side menu (Sheet) behavior so that when it opens it renders a full-viewport transparent overlay over the entire page (including the area where the menu icon is), without darkening the page; the overlay must block interaction with underlying content and clicking/tapping the overlay must close the menu.",
+      "id": "feature-make-the-first-screen-shown-on-initial-app-load-a-dedicated-mobile-number-entry-page-with-an-input-and-two-actions-continue-save-number-and-skip-do-not-save-do-not-show-the-main-app-content-or-the-menu-button-until-the-user-chooses-continue-or-skip",
+      "title": "Make the first screen shown on initial app load a dedicated mobile-number entry page with an input and two actions: “Continue” (save number) and “Skip” (do not save). Do not show the main app content or the menu button until the user chooses Continue or Skip.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-fix-the-mobile-layout-issue-where-a-section-overlaps-the-home-screen-by-correcting-responsive-spacing-stacking-so-home-content-is-fully-visible-and-not-covered-by-header-footer-navigation-elements-on-common-mobile-breakpoints",
-      "title": "Fix the mobile layout issue where a section overlaps the Home screen by correcting responsive spacing/stacking so Home content is fully visible and not covered by header/footer/navigation elements on common mobile breakpoints.",
+      "id": "feature-when-the-user-enters-a-mobile-number-on-the-first-screen-persist-it-so-it-can-be-used-as-the-user-s-username-by-saving-it-into-the-caller-s-profile-phone-number-field-datingprofile-phonenumber-if-the-user-is-not-yet-authenticated-or-does-not-yet-have-a-profile-at-the-time-of-entry-store-the-number-locally-and-apply-it-automatically-to-the-profile-as-soon-as-saving-the-caller-profile-becomes-possible",
+      "title": "When the user enters a mobile number on the first screen, persist it so it can be used as the user’s username by saving it into the caller’s profile phone number field (DatingProfile.phoneNumber). If the user is not yet authenticated or does not yet have a profile at the time of entry, store the number locally and apply it automatically to the profile as soon as saving the caller profile becomes possible.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-make-swipe-cards-functional-end-to-end-discovery-must-provide-a-stable-identifier-principal-for-each-profile-card-and-like-pass-actions-must-call-the-backend-likeprofile-rejectprofile-mutations-for-the-currently-shown-card-and-then-advance-to-the-next-card",
-      "title": "Make swipe cards functional end-to-end: discovery must provide a stable identifier (Principal) for each profile card, and Like/Pass actions must call the backend likeProfile/rejectProfile mutations for the currently shown card and then advance to the next card.",
+      "id": "feature-after-completing-the-mobile-number-entry-continue-or-skip-show-the-exact-same-next-page-content-that-the-app-currently-shows-no-removal-of-existing-features-content-including-the-existing-menu-button-and-navigation",
+      "title": "After completing the mobile-number entry (Continue or Skip), show the exact same “next page” content that the app currently shows (no removal of existing features/content), including the existing menu button and navigation.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-a-real-matching-screen-flow-when-a-like-results-in-a-mutual-match-show-a-dedicated-it-s-a-match-screen-modal-with-both-users-basic-info-and-a-primary-action-to-start-chat-plus-a-secondary-action-to-keep-swiping",
-      "title": "Implement a real matching screen/flow: when a Like results in a mutual match, show a dedicated ‘It’s a match’ screen/modal with both users’ basic info and a primary action to start chat, plus a secondary action to keep swiping.",
+      "id": "feature-remove-fix-the-persistent-web-page-overlay-so-that-no-unintended-transparent-blur-overlay-blocks-interaction-after-the-menu-is-closed-specifically-ensure-that-any-overlay-used-for-the-menu-only-exists-while-the-menu-is-open-and-is-fully-removed-disabled-when-closed",
+      "title": "Remove/fix the persistent web-page overlay so that no unintended transparent/blur overlay blocks interaction after the menu is closed. Specifically, ensure that any overlay used for the menu only exists while the menu is open and is fully removed/disabled when closed.",
       "reqIds": [
         "REQ-4"
       ],
       "version": 1
     },
     {
-      "id": "feature-make-the-matches-page-list-real-matches-by-adding-using-backend-support-to-fetch-the-caller-s-matched-users-including-their-principals-and-render-them-in-the-existing-matches-page-selecting-a-match-must-open-chat-with-the-correct-match-principal",
-      "title": "Make the Matches page list real matches by adding/using backend support to fetch the caller’s matched users (including their principals) and render them in the existing Matches page; selecting a match must open Chat with the correct match principal.",
+      "id": "feature-apply-an-orange-and-pink-background-theme-across-the-entire-app-all-pages-including-the-first-mobile-number-screen-and-the-existing-main-pages-the-background-should-clearly-show-orange-and-pink-e-g-a-gradient-and-remain-consistent-across-navigation",
+      "title": "Apply an orange-and-pink background theme across the entire app (all pages, including the first mobile-number screen and the existing main pages). The background should clearly show orange and pink (e.g., a gradient) and remain consistent across navigation.",
       "reqIds": [
         "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-cohesive-tinder-like-ui-style-2-refresh-across-home-cards-matches-list-items-and-chat-message-bubbles-header-while-keeping-user-facing-copy-in-english-update-colors-spacing-typography-and-animations-consistently-without-switching-the-app-to-dark-mode",
-      "title": "Apply a cohesive Tinder-like ‘UI style 2’ refresh across Home (cards), Matches (list items), and Chat (message bubbles/header) while keeping user-facing copy in English; update colors, spacing, typography, and animations consistently without switching the app to dark mode.",
-      "reqIds": [
-        "REQ-7"
       ],
       "version": 1
     }
@@ -58,56 +54,24 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Add full-page transparent overlay behind the side menu when opened (not darkened).",
+      "summary": "Make the first page a mobile-number entry screen with Enter and Skip options; only after enter/skip proceed to the main page.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Fix mobile UI section overlapping the home screen (layout/stacking issue).",
+      "summary": "Store entered mobile number and use it as the username.",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Implement Tinder-style swipe cards experience.",
+      "summary": "Apply an orange/pink color theme to the entire app background (global styling).",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Add user profile screens/features.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Add matching screen/flow.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Add chat/messaging feature.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Apply Tinder-like overall UI style across the app.",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-13",
-      "summary": "Fix backend match/chat identity correctness by implementing a deterministic, collision-resistant match/chat ID derived from both principals (instead of returning a constant), and ensure all match-related stores (matchStore/chatStore/signalingStore) use this ID consistently.",
-      "reqIds": [
-        "REQ-6"
-      ],
       "status": "pending"
     }
   ],
-  "projectName": "Tinder-style swipe + matching/chat flow, transparent menu overlay, and mobile overlap fixes",
+  "projectName": "Add mobile-number first screen, store as username, fix overlay, apply orange/pink background",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

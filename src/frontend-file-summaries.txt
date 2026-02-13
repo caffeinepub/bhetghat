@@ -8,11 +8,11 @@
   "frontend/src/hooks/useOnlineStatus.ts": "Custom hook tracking browser online/offline status using navigator.onLine and window events.",
   "frontend/src/components/OfflineState.tsx": "Bilingual offline screen component displayed when network connection is unavailable.",
   "frontend/src/components/LanguageToggle.tsx": "Dropdown menu component allowing users to switch between English and Nepali languages.",
-  "frontend/src/components/AppLayout.tsx": "Main layout wrapper with header, transparent overlay when side menu is open (non-darkening backdrop-blur), navigation sheet, content area with safe-area bottom padding, and footer with attribution.",
+  "frontend/src/components/AppLayout.tsx": "Main layout wrapper with header, Sheet-based navigation menu (no custom overlay), content area with safe-area bottom padding, and footer with attribution; uses card backgrounds for header/footer readability.",
   "frontend/src/pages/InstallHelp.tsx": "Installation instructions page with fully internationalized content replacing all hardcoded English strings with i18n keys.",
   "frontend/src/pages/Welcome.tsx": "Landing page with app features, motto, and login prompt for unauthenticated users.",
-  "frontend/src/App.tsx": "Main app component with routing, profile gating, phone number prompt modal, match modal integration with proper null handling for userProfile, and navigation callbacks that preserve discovery state and pass principals correctly to Chat.",
-  "frontend/src/index.css": "Global styles with OKLCH-based pink/rose color theme, increased border radius for modern look, mobile-friendly touch targets, safe area bottom padding utility, and stable video element dimensions.",
+  "frontend/src/App.tsx": "Main app component with mobile number entry gate (session-gated), routing, profile setup, phone number persistence via pending hook, match modal integration, and navigation callbacks.",
+  "frontend/src/index.css": "Global styles with OKLCH-based orange/pink gradient background (fixed attachment), updated theme tokens for orange-pink palette, mobile-friendly touch targets, safe area padding, and stable video dimensions.",
   "frontend/tailwind.config.js": "Tailwind configuration extending theme with custom colors, increased border radius, enhanced shadow utilities for card hover effects, and mobile-first container settings.",
   "frontend/src/hooks/useQueries.ts": "React Query hooks for all backend operations including profiles, discovery, matches with principals, chat messaging, and video call signaling with proper query invalidation and polling configuration.",
   "frontend/public/offline.html": "Standalone bilingual (English/Nepali) offline fallback page with styled layout, animations, and retry button for when the app is accessed without internet connection.",
@@ -28,5 +28,7 @@
   "frontend/src/hooks/useVideoCall.ts": "Custom React hook managing WebRTC peer connection lifecycle, local/remote media streams, call state machine (idle/outgoing/incoming/connecting/connected/ended/error), and signaling via polling-based backend queries with proper ChatId type support, cleanup, and type-safe error handling using TranslationKey.",
   "frontend/src/utils/chatId.ts": "Utility function computing deterministic ChatId objects (not bigint) from two principals using stable ordering to ensure both peers generate identical IDs for signaling coordination, returning proper ChatId type matching backend interface.",
   "frontend/src/components/PhoneNumberPromptModal.tsx": "Modal component prompting authenticated users with existing profiles but no phone number to optionally add it, with Save and Skip actions using shadcn Dialog primitives.",
-  "frontend/src/components/ItsAMatchModal.tsx": "Match celebration modal displaying both users' avatars with animated heart, providing actions to start chat or continue swiping without resetting the discovery deck."
+  "frontend/src/components/ItsAMatchModal.tsx": "Match celebration modal displaying both users' avatars with animated heart, providing actions to start chat or continue swiping without resetting the discovery deck.",
+  "frontend/src/pages/MobileNumberEntry.tsx": "Full-screen mobile number entry gate with phone input, Continue and Skip buttons, displayed before the main app on first session.",
+  "frontend/src/hooks/usePendingPhoneNumber.ts": "Hook managing locally queued phone numbers in localStorage, automatically saving them to the caller profile once authentication and profile are available."
 }

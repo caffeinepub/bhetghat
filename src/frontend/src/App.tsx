@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useOnlineStatus } from './hooks/useOnlineStatus';
 import { useGetCallerProfile } from './hooks/useQueries';
+import { usePendingPhoneNumber, setPendingPhoneNumber } from './hooks/usePendingPhoneNumber';
 import { AppLayout } from './components/AppLayout';
 import { OfflineState } from './components/OfflineState';
 import { Welcome } from './pages/Welcome';
@@ -11,6 +12,7 @@ import { Matches } from './pages/Matches';
 import { Chat } from './pages/Chat';
 import { Profile } from './pages/Profile';
 import { Settings } from './pages/Settings';
+import { MobileNumberEntry } from './pages/MobileNumberEntry';
 import { PhoneNumberPromptModal } from './components/PhoneNumberPromptModal';
 import { ItsAMatchModal } from './components/ItsAMatchModal';
 import type { DatingProfile } from './backend';
@@ -21,6 +23,8 @@ import { ThemeProvider } from 'next-themes';
 
 type PageType = 'home' | 'matches' | 'chat' | 'profile' | 'settings' | 'install';
 
+const MOBILE_GATE_KEY = 'mobileGateCompleted';
+
 function AppContent() {
   const { identity } = useInternetIdentity();
   const isOnline = useOnlineStatus();
@@ -29,6 +33,10 @@ function AppContent() {
   const [selectedMatch, setSelectedMatch] = useState<{ profile: DatingProfile; principal: Principal | null } | null>(null);
   const [phonePromptDismissed, setPhonePromptDismissed] = useState(false);
   const [matchModal, setMatchModal] = useState<{ profile: DatingProfile; principal: Principal } | null>(null);
+  const [mobileGateCompleted, setMobileGateCompleted] = useState(false);
+
+  // Apply pending phone number when possible
+  usePendingPhoneNumber();
 
   const isAuthenticated = !!identity;
 
@@ -38,8 +46,13 @@ function AppContent() {
     console.log('[App] React app mounted successfully');
   }, []);
 
-  // Check sessionStorage for dismissed state on mount
+  // Check sessionStorage for mobile gate and phone prompt dismissed state on mount
   useEffect(() => {
+    const gateCompleted = sessionStorage.getItem(MOBILE_GATE_KEY);
+    if (gateCompleted === 'true') {
+      setMobileGateCompleted(true);
+    }
+
     const dismissed = sessionStorage.getItem('phonePromptDismissed');
     if (dismissed === 'true') {
       setPhonePromptDismissed(true);
@@ -48,6 +61,25 @@ function AppContent() {
 
   if (!isOnline) {
     return <OfflineState />;
+  }
+
+  // Show mobile number entry gate first (before anything else)
+  if (!mobileGateCompleted) {
+    return (
+      <MobileNumberEntry
+        onContinue={(phoneNumber) => {
+          if (phoneNumber) {
+            setPendingPhoneNumber(phoneNumber);
+          }
+          sessionStorage.setItem(MOBILE_GATE_KEY, 'true');
+          setMobileGateCompleted(true);
+        }}
+        onSkip={() => {
+          sessionStorage.setItem(MOBILE_GATE_KEY, 'true');
+          setMobileGateCompleted(true);
+        }}
+      />
+    );
   }
 
   const handleNavigate = (page: string) => {

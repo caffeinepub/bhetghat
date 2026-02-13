@@ -38,9 +38,9 @@ export function AppLayout({ children, currentPage = 'home', onNavigate }: AppLay
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-card/80 backdrop-blur supports-[backdrop-filter]:bg-card/60">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Heart className="h-6 w-6 text-primary fill-primary" />
@@ -92,22 +92,13 @@ export function AppLayout({ children, currentPage = 'home', onNavigate }: AppLay
         </div>
       </header>
 
-      {/* Transparent overlay when menu is open */}
-      {sheetOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-transparent backdrop-blur-[2px]"
-          onClick={() => setSheetOpen(false)}
-          style={{ pointerEvents: 'auto' }}
-        />
-      )}
-
       {/* Main Content */}
       <main className="flex-1 pb-safe">
         {children}
       </main>
 
       {/* Footer */}
-      <footer className="border-t bg-muted/30 py-6 mt-auto">
+      <footer className="border-t bg-card/50 py-6 mt-auto">
         <div className="container px-4 text-center text-sm text-muted-foreground">
           <p>
             {t('builtWith')} <Heart className="inline h-4 w-4 text-primary fill-primary" /> {t('using')}{' '}

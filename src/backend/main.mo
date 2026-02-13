@@ -4,11 +4,10 @@ import Principal "mo:core/Principal";
 import Order "mo:core/Order";
 import Iter "mo:core/Iter";
 import Runtime "mo:core/Runtime";
+import Text "mo:core/Text";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   module Matches {
     public func compare(a : ChatId, b : ChatId) : Order.Order {
@@ -87,6 +86,7 @@ actor {
     #BufferFull;
   };
 
+  // State Storage
   let profileStore = Map.empty<Principal, DatingProfile>();
   let matchStore = Map.empty<ChatId, Match>();
   let chatStore = Map.empty<ChatId, [Message]>();
@@ -190,8 +190,8 @@ actor {
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?DatingProfile {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can view profiles");
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
     };
 
     // Users can view their own full profile
@@ -200,15 +200,10 @@ actor {
     };
 
     // Admins can view any profile but without phone number (privacy protection)
-    if (AccessControl.isAdmin(accessControlState, caller)) {
-      return switch (profileStore.get(user)) {
-        case (null) { null };
-        case (?profile) { ?{ profile with phoneNumber = null } };
-      };
+    return switch (profileStore.get(user)) {
+      case (null) { null };
+      case (?profile) { ?{ profile with phoneNumber = null } };
     };
-
-    // Non-admin users cannot view other users' profiles through this endpoint
-    Runtime.trap("Unauthorized: Can only view your own profile");
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : DatingProfile) : async () {
@@ -432,7 +427,8 @@ actor {
     };
 
     // Verify caller is part of the chat (match verification)
-    switch (matchStore.get(chatId)) {
+    let normalizedChatId = normalizeChatId(chatId.user1, chatId.user2);
+    switch (matchStore.get(normalizedChatId)) {
       case (?match) {
         if (match.user1 != caller and match.user2 != caller) {
           Runtime.trap("Unauthorized: Can only retrieve signaling messages from your own matches");
@@ -443,7 +439,7 @@ actor {
       };
     };
 
-    switch (signalingStore.get(chatId)) {
+    switch (signalingStore.get(normalizedChatId)) {
       case (?messages) {
         messages.filter(func(m) { m.timestamp > lastTimestamp });
       };
